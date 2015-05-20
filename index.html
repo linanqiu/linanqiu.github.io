@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Pandamonium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Linan&apos;s Blog">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pandamonium">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Pandamonium">
+<meta property="og:description" content="Linan&apos;s Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pandamonium">
+<meta name="twitter:description" content="Linan&apos;s Blog">
+  
+    <link rel="alternative" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Pandamonium</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Musings of a Panda</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="q" value="site:http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-word2vec-sentiment" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/05/20/word2vec-sentiment/" class="article-date">
+  <time datetime="2015-05-20T07:05:38.000Z" itemprop="datePublished">2015-05-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/05/20/word2vec-sentiment/">Sentiment Analysis using Doc2Vec</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Word2Vec is dope. In short, it takes in a corpus, and churns out vectors for each of those words. What’s so special about these vectors you ask? Well, similar words are near each other. Furthermore, these vectors represent how we use the words. For example, <code>v_man - v_woman</code> is approximately equal to <code>v_king - v_queen</code>, illustrating the relationship that “man is to woman as king is to queen”. This process, in NLP voodoo, is called <strong>word embedding</strong>. These representations have been applied widely. This is made even more awesome with the introduction of Doc2Vec that represents not only words, but entire sentences and documents. Imagine being able to represent an entire sentence using a fixed-length vector and proceeding to run all your standard classification algorithms. Isn’t that amazing?</p>
+<p>However, Word2Vec documentation is shit. The C-code is nigh unreadable (700 lines of highly optimized, and sometimes weirdly optimized code). I personally spent a lot of time untangling Doc2Vec and crashing into ~50% accuracies due to implementation mistakes. This tutorial aims to help other users get off the ground using Word2Vec for their own research. We use Word2Vec for <strong>sentiment analysis</strong> by attempting to classify the Cornell IMDB movie review corpus (<a href="http://www.cs.cornell.edu/people/pabo/movie-review-data/" target="_blank" rel="external">http://www.cs.cornell.edu/people/pabo/movie-review-data/</a>).</p>
+<p>The source code used in this demo can be found at <a href="https://github.com/linanqiu/word2vec-sentiments" target="_blank" rel="external">https://github.com/linanqiu/word2vec-sentiments</a></p>
+<h2 id="Setup">Setup</h2><h3 id="Modules">Modules</h3><p>We use <code>gensim</code>, since <code>gensim</code> has a much more readable implementation of Word2Vec (and Doc2Vec). Bless those guys. We also use <code>numpy</code> for general array manipulation, and <code>sklearn</code> for Logistic Regression classifier.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># gensim modules</span></span><br><span class="line"><span class="keyword">from</span> gensim <span class="keyword">import</span> utils</span><br><span class="line"><span class="keyword">from</span> gensim.models.doc2vec <span class="keyword">import</span> LabeledSentence</span><br><span class="line"><span class="keyword">from</span> gensim.models <span class="keyword">import</span> Doc2Vec</span><br><span class="line"></span><br><span class="line"><span class="comment"># numpy</span></span><br><span class="line"><span class="keyword">import</span> numpy</span><br><span class="line"></span><br><span class="line"><span class="comment"># classifier</span></span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LogisticRegression</span><br></pre></td></tr></table></figure>
+<h3 id="Input_Format">Input Format</h3><p>We can’t input the raw reviews from the Cornell movie review data repository. Instead, we clean them up by converting everything to lower case and removing punctuation. I did this via bash, and you can do this easily via Python, JS, or your favorite poison. This step is trivial.</p>
+<p>The result is to have five documents:</p>
+<ul>
+<li><code>test-neg.txt</code>: 12500 negative movie reviews from the test data</li>
+<li><code>test-pos.txt</code>: 12500 positive movie reviews from the test data</li>
+<li><code>train-neg.txt</code>: 12500 negative movie reviews from the training data</li>
+<li><code>train-pos.txt</code>: 12500 positive movie reviews from the training data</li>
+<li><code>train-unsup.txt</code>: 50000 Unlabelled movie reviews</li>
+</ul>
+<p>Each of the reviews should be formatted as such:</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">once again mr costner has dragged out a movie <span class="keyword">for</span> far longer than necessary <span class="keyword">aside from</span> <span class="keyword">the</span> terrific sea rescue sequences <span class="keyword">of</span> which there are very few i just did <span class="keyword">not</span> care <span class="keyword">about</span> any <span class="keyword">of</span> <span class="keyword">the</span> <span class="property">characters</span> most <span class="keyword">of</span> us have ghosts <span class="keyword">in</span> <span class="keyword">the</span> closet <span class="keyword">and</span> costner s <span class="property">character</span> are realized early <span class="function_start"><span class="keyword">on</span></span> <span class="keyword">and</span> <span class="keyword">then</span> forgotten <span class="keyword">until</span> much later <span class="keyword">by</span> which <span class="property">time</span> i did <span class="keyword">not</span> care <span class="keyword">the</span> <span class="property">character</span> we should really care <span class="keyword">about</span> <span class="keyword">is</span> a very cocky overconfident ashton kutcher <span class="keyword">the</span> problem <span class="keyword">is</span> he comes off <span class="keyword">as</span> kid who thinks he s better than anyone <span class="keyword">else</span> <span class="keyword">around</span> him <span class="keyword">and</span> shows no signs <span class="keyword">of</span> a cluttered closet his only obstacle appears <span class="keyword">to</span> be winning <span class="keyword">over</span> costner finally when we are well past <span class="keyword">the</span> half way point <span class="keyword">of</span> this stinker costner tells us all <span class="keyword">about</span> kutcher s ghosts we are told why kutcher <span class="keyword">is</span> driven <span class="keyword">to</span> be <span class="keyword">the</span> best <span class="keyword">with</span> no prior inkling <span class="keyword">or</span> foreshadowing no magic here <span class="keyword">it</span> was all i could do <span class="keyword">to</span> keep <span class="keyword">from</span> turning <span class="keyword">it</span> off an hour <span class="keyword">in</span></span><br><span class="line">this <span class="keyword">is</span> an example <span class="keyword">of</span> why <span class="keyword">the</span> majority <span class="keyword">of</span> action films are <span class="keyword">the</span> same generic <span class="keyword">and</span> boring there s really nothing worth watching here a complete waste <span class="keyword">of</span> <span class="keyword">the</span> <span class="keyword">then</span> barely tapped talents <span class="keyword">of</span> ice t <span class="keyword">and</span> ice cube who ve each proven many <span class="keyword">times</span> <span class="keyword">over</span> <span class="keyword">that</span> they are capable <span class="keyword">of</span> acting <span class="keyword">and</span> acting well don t bother <span class="keyword">with</span> this one go see new jack city ricochet <span class="keyword">or</span> watch new york undercover <span class="keyword">for</span> ice t <span class="keyword">or</span> boyz n <span class="keyword">the</span> hood higher learning <span class="keyword">or</span> friday <span class="keyword">for</span> ice cube <span class="keyword">and</span> see <span class="keyword">the</span> <span class="type">real</span> deal ice t s horribly cliched dialogue alone makes this film grate <span class="keyword">at</span> <span class="keyword">the</span> teeth <span class="keyword">and</span> i m still wondering what <span class="keyword">the</span> heck bill paxton was doing <span class="keyword">in</span> this film <span class="keyword">and</span> why <span class="keyword">the</span> heck <span class="keyword">does</span> he always play <span class="keyword">the</span> exact same <span class="property">character</span> <span class="keyword">from</span> aliens onward <span class="keyword">every</span> film i ve seen <span class="keyword">with</span> bill paxton has him playing <span class="keyword">the</span> exact same irritating <span class="property">character</span> <span class="keyword">and</span> <span class="keyword">at</span> least <span class="keyword">in</span> aliens his <span class="property">character</span> died which made <span class="keyword">it</span> somewhat gratifying overall this <span class="keyword">is</span> <span class="keyword">second</span> rate action trash there are countless better films <span class="keyword">to</span> see <span class="keyword">and</span> <span class="keyword">if</span> you really want <span class="keyword">to</span> see this one watch judgement night which <span class="keyword">is</span> practically a carbon <span class="keyword">copy</span> <span class="keyword">but</span> has better acting <span class="keyword">and</span> a better <span class="keyword">script</span> <span class="keyword">the</span> only thing <span class="keyword">that</span> made this <span class="keyword">at</span> all worth watching was a decent hand <span class="function_start"><span class="keyword">on</span></span> <span class="keyword">the</span> camera <span class="keyword">the</span> cinematography was almost refreshing which comes close <span class="keyword">to</span> making up <span class="keyword">for</span> <span class="keyword">the</span> horrible film itself <span class="keyword">but</span> <span class="keyword">not</span> quite</span><br></pre></td></tr></table></figure>
+<p>The sample up there contains two movie reviews, each one taking up one entire line. Yes, <strong>each document should be on one line, separated by new lines</strong>. This is extremely important, because our parser depends on this to identify sentences.</p>
+<h3 id="Feeding_Data_to_Doc2Vec">Feeding Data to Doc2Vec</h3><p>Doc2Vec (the portion of <code>gensim</code> that implements the Doc2Vec algorithm) does a great job at word embedding, but a terrible job at reading in files. It only takes in <code>LabeledLineSentence</code> classes which basically yields <code>LabeledSentence</code>, a class from <code>gensim.models.doc2vec</code> representing a single sentence. Why the “Labeled” word? Well, here’s how Doc2Vec differs from Word2Vec.</p>
+<p>Word2Vec simply converts a word into a vector.</p>
+<p>Doc2Vec not only does that, but also aggregates all the words in a sentence into a vector. To do that, it simply treats a sentence label as a special word, and does some voodoo on that special word. Hence, that special word is a label for a sentence. </p>
+<p>So we have to format sentences into</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[<span class="string">'word1'</span>, <span class="string">'word2'</span>, <span class="string">'word3'</span>, <span class="string">'lastword'</span>], [<span class="string">'label1'</span>]]</span><br></pre></td></tr></table></figure>
+<p><code>LabeledSentence</code> is simply a tidier way to do that. It contains a list of words, and a label for the sentence. We don’t really need to care about how <code>LabeledSentence</code> works exactly, we just have to know that it stores those two things — a list of words and a label.</p>
+<p>However, we need a way to convert our new line separated corpus into a collection of <code>LabeledSentence</code>s. The default constructor for the default <code>LabeledLineSentence</code> class in Doc2Vec can do that for a single text file, but can’t do that for multiple files. In classification tasks however, we usually deal with multiple documents (test, training, positive, negative etc). Ain’t that annoying?</p>
+<p>So we write our own <code>LabeledLineSentence</code> class. The constructor takes in a dictionary that defines the files to read and the label prefixes sentences from that document should take on. Then, Doc2Vec can either read the collection directly via the iterator, or we can access the array directly. We also need a function to return a permutated version of the array of <code>LabeledSentence</code>s. We’ll see why later on.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LabeledLineSentence</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, sources)</span>:</span></span><br><span class="line">        self.sources = sources</span><br><span class="line">        </span><br><span class="line">        flipped = &#123;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># make sure that keys are unique</span></span><br><span class="line">        <span class="keyword">for</span> key, value <span class="keyword">in</span> sources.items():</span><br><span class="line">            <span class="keyword">if</span> value <span class="keyword">not</span> <span class="keyword">in</span> flipped:</span><br><span class="line">                flipped[value] = [key]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">raise</span> Exception(<span class="string">'Non-unique prefix encountered'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> source, prefix <span class="keyword">in</span> self.sources.items():</span><br><span class="line">            <span class="keyword">with</span> utils.smart_open(source) <span class="keyword">as</span> fin:</span><br><span class="line">                <span class="keyword">for</span> item_no, line <span class="keyword">in</span> enumerate(fin):</span><br><span class="line">                    <span class="keyword">yield</span> LabeledSentence(utils.to_unicode(line).split(), [prefix + <span class="string">'_%s'</span> % item_no])</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_array</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sentences = []</span><br><span class="line">        <span class="keyword">for</span> source, prefix <span class="keyword">in</span> self.sources.items():</span><br><span class="line">            <span class="keyword">with</span> utils.smart_open(source) <span class="keyword">as</span> fin:</span><br><span class="line">                <span class="keyword">for</span> item_no, line <span class="keyword">in</span> enumerate(fin):</span><br><span class="line">                    self.sentences.append(LabeledSentence(utils.to_unicode(line).split(), [prefix + <span class="string">'_%s'</span> % item_no]))</span><br><span class="line">        <span class="keyword">return</span> self.sentences</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">sentences_perm</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> numpy.random.permutation(self.sentences)</span><br></pre></td></tr></table></figure>
+<p>Now we can feed the data files to <code>LabeledLineSentence</code>. As we mentioned earlier, <code>LabeledLineSentence</code> simply takes a dictionary with keys as the file names and values the special prefixes for sentences from that document. The prefixes need to be unique, so that there is no ambiguitiy for sentences from different documents.</p>
+<p>The prefixes will have a counter appended to them to label individual sentences in the documetns.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sources = &#123;<span class="string">'test-neg.txt'</span>:<span class="string">'TEST_NEG'</span>, <span class="string">'test-pos.txt'</span>:<span class="string">'TEST_POS'</span>, <span class="string">'train-neg.txt'</span>:<span class="string">'TRAIN_NEG'</span>, <span class="string">'train-pos.txt'</span>:<span class="string">'TRAIN_POS'</span>, <span class="string">'train-unsup.txt'</span>:<span class="string">'TRAIN_UNS'</span>&#125;</span><br><span class="line"></span><br><span class="line">sentences = LabeledLineSentence(sources)</span><br></pre></td></tr></table></figure>
+<h2 id="Model">Model</h2><h3 id="Building_the_Vocabulary_Table">Building the Vocabulary Table</h3><p>Doc2Vec requires us to build the vocabulary table (simply digesting all the words and filtering out the unique words, and doing some basic counts on them). So we feed it the array of sentences. <code>model.build_vocab</code> takes an array of <code>LabeledLineSentence</code>, hence our <code>to_array</code> function in the <code>LabeledLineSentences</code> class. </p>
+<p>If you’re curious about the parameters, do read the Word2Vec documentation. Otherwise, here’s a quick rundown:</p>
+<ul>
+<li><code>min_count</code>: ignore all words with total frequency lower than this. You have to set this to 1, since the sentence labels only appear once. Setting it any higher than 1 will miss out on the sentences.</li>
+<li><code>window</code>: the maximum distance between the current and predicted word within a sentence. Word2Vec uses a skip-gram model, and this is simply the window size of the skip-gram model.</li>
+<li><code>size</code>: dimensionality of the feature vectors in output. 100 is a good number. If you’re extreme, you can go up to around 400.</li>
+<li><code>sample</code>: threshold for configuring which higher-frequency words are randomly downsampled</li>
+<li><code>workers</code>: use this many worker threads to train the model </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">model = Doc2Vec(min_count=<span class="number">1</span>, window=<span class="number">10</span>, size=<span class="number">100</span>, sample=<span class="number">1e-4</span>, negative=<span class="number">5</span>, workers=<span class="number">7</span>)</span><br><span class="line"></span><br><span class="line">model.build_vocab(sentences.to_array())</span><br></pre></td></tr></table></figure>
+<h3 id="Training_Doc2Vec">Training Doc2Vec</h3><p>Now we train the model. The model is better trained if <strong>in each training epoch, the sequence of sentences fed to the model is randomized</strong>. This is important: missing out on this steps gives you really shitty results. This is the reason for the <code>sentences_perm</code> method in our <code>LabeledLineSentences</code> class.</p>
+<p>We train it for 10 epochs. If I had more time, I’d have done 20.</p>
+<p>This process takes around 10 mins, so go grab some coffee.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">    model.train(sentences.sentences_perm())</span><br></pre></td></tr></table></figure>
+<h3 id="Inspecting_the_Model">Inspecting the Model</h3><p>Let’s see what our model gives. It seems that it has kind of understood the word <code>good</code>, since the most similar words to good are <code>glamorous</code>, <code>spectacular</code>, <code>astounding</code> etc. This is really awesome (and important), since we are doing sentiment analysis.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">model.most_similar(<span class="string">'good'</span>)</span><br><span class="line"></span><br><span class="line">[(<span class="string">u'tekashi'</span>, <span class="number">0.45127424597740173</span>),</span><br><span class="line"> (<span class="string">u'glamorous'</span>, <span class="number">0.4344240427017212</span>),</span><br><span class="line"> (<span class="string">u'spectacular'</span>, <span class="number">0.42718690633773804</span>),</span><br><span class="line"> (<span class="string">u'astounding'</span>, <span class="number">0.42001062631607056</span>),</span><br><span class="line"> (<span class="string">u'valentinov'</span>, <span class="number">0.41705751419067383</span>),</span><br><span class="line"> (<span class="string">u'sweetest'</span>, <span class="number">0.4043062925338745</span>),</span><br><span class="line"> (<span class="string">u'complementary'</span>, <span class="number">0.4039931297302246</span>),</span><br><span class="line"> (<span class="string">u'boyyyyy'</span>, <span class="number">0.39713743329048157</span>),</span><br><span class="line"> (<span class="string">u'macdonaldsland'</span>, <span class="number">0.3965899348258972</span>),</span><br><span class="line"> (<span class="string">u'elven'</span>, <span class="number">0.39042729139328003</span>)]</span><br></pre></td></tr></table></figure>
+<p>We can also prop the hood open and see what the model actually contains. This is each of the vectors of the words and sentences in the model. We can access all of them using <code>model.syn0</code> (for the geekier ones among you, <code>syn0</code> is simply the output layer of the shallow neural network). However, we don’t want to use the entire <code>syn0</code> since that contains the vectors for the words as well, but we are only interested in the ones for sentences.</p>
+<p>Here’s a sample vector for the first sentence in the training set for negative reviews:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">model[<span class="string">'TRAIN_NEG_0'</span>]</span><br><span class="line"></span><br><span class="line">array([ <span class="number">0.45238438</span>, -<span class="number">0.07346677</span>, -<span class="number">0.17444436</span>,  <span class="number">0.60655016</span>, -<span class="number">0.70522565</span>,</span><br><span class="line">        <span class="number">0.28476399</span>,  <span class="number">0.24404588</span>,  <span class="number">0.09271102</span>, -<span class="number">0.02715847</span>, -<span class="number">0.13526627</span>,</span><br><span class="line">       -<span class="number">0.12390804</span>, -<span class="number">0.00219905</span>,  <span class="number">0.011253</span>  ,  <span class="number">0.24557671</span>, -<span class="number">0.09958933</span>,</span><br><span class="line">        <span class="number">0.17554867</span>,  <span class="number">0.16079453</span>, -<span class="number">0.18499082</span>, -<span class="number">0.31598854</span>,  <span class="number">0.01447532</span>,</span><br><span class="line">        <span class="number">0.52194822</span>, -<span class="number">0.2387463</span> ,  <span class="number">0.16799606</span>,  <span class="number">0.47053325</span>,  <span class="number">0.09696233</span>,</span><br><span class="line">       -<span class="number">0.2582404</span> , -<span class="number">0.19224562</span>, -<span class="number">0.07114315</span>, -<span class="number">0.25864932</span>, -<span class="number">0.5387702</span> ,</span><br><span class="line">        <span class="number">0.01053433</span>,  <span class="number">0.43367237</span>,  <span class="number">0.07885301</span>,  <span class="number">0.04634216</span>,  <span class="number">0.0899957</span> ,</span><br><span class="line">        <span class="number">0.06260718</span>, -<span class="number">0.38053334</span>,  <span class="number">0.18118465</span>,  <span class="number">0.14301547</span>,  <span class="number">0.18286002</span>,</span><br><span class="line">       -<span class="number">0.31105465</span>,  <span class="number">0.2040111</span> , -<span class="number">0.76622951</span>,  <span class="number">0.06977512</span>,  <span class="number">0.11759907</span>,</span><br><span class="line">       -<span class="number">0.11566088</span>, -<span class="number">0.00373716</span>, -<span class="number">0.14705311</span>, -<span class="number">0.29019266</span>, -<span class="number">0.04825564</span>,</span><br><span class="line">        <span class="number">0.20127594</span>, -<span class="number">0.0258627</span> , -<span class="number">0.20973501</span>,  <span class="number">0.48925173</span>, -<span class="number">0.31426486</span>,</span><br><span class="line">        <span class="number">0.3180953</span> ,  <span class="number">0.41300809</span>, -<span class="number">0.29024398</span>, -<span class="number">0.21187432</span>,  <span class="number">0.10730035</span>,</span><br><span class="line">        <span class="number">0.30392009</span>, -<span class="number">0.2130826</span> ,  <span class="number">0.47062019</span>, -<span class="number">0.17570473</span>,  <span class="number">0.21256927</span>,</span><br><span class="line">        <span class="number">0.51417089</span>, -<span class="number">0.00951673</span>,  <span class="number">0.1525774</span> ,  <span class="number">0.05895659</span>,  <span class="number">0.33289343</span>,</span><br><span class="line">        <span class="number">0.56261861</span>, -<span class="number">0.05355176</span>, -<span class="number">0.05011608</span>,  <span class="number">0.24092411</span>, -<span class="number">0.17943399</span>,</span><br><span class="line">       -<span class="number">0.26373053</span>,  <span class="number">0.22000515</span>,  <span class="number">0.05890461</span>, -<span class="number">0.24378468</span>,  <span class="number">0.58705276</span>,</span><br><span class="line">        <span class="number">0.01776701</span>,  <span class="number">0.04332061</span>, -<span class="number">0.04941204</span>,  <span class="number">0.24699709</span>, -<span class="number">0.28202724</span>,</span><br><span class="line">       -<span class="number">0.27278683</span>,  <span class="number">0.2515423</span> ,  <span class="number">0.12944862</span>, -<span class="number">0.29060578</span>, -<span class="number">0.02939321</span>,</span><br><span class="line">        <span class="number">0.42860341</span>, -<span class="number">0.27076352</span>, -<span class="number">0.56153166</span>,  <span class="number">0.35900518</span>, -<span class="number">0.11538842</span>,</span><br><span class="line">       -<span class="number">0.29707447</span>,  <span class="number">0.15181458</span>,  <span class="number">0.73098952</span>,  <span class="number">0.308236</span>  ,  <span class="number">0.52810729</span>], dtype=float32)</span><br></pre></td></tr></table></figure>
+<h3 id="Saving_and_Loading_Models">Saving and Loading Models</h3><p>To avoid training the model again, we can save it.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.save(<span class="string">'./imdb.d2v'</span>)</span><br></pre></td></tr></table></figure>
+<p>And load it.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model = Doc2Vec.load(<span class="string">'./imdb.d2v'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Classifying_Sentiments">Classifying Sentiments</h2><h3 id="Training_Vectors">Training Vectors</h3><p>Now let’s use these vectors to train a classifier. First, we must extract the training vectors. Remember that we have a total of 25000 training reviews, with equal numbers of positive and negative ones (12500 positive, 12500 negative).</p>
+<p>Hence, we create a <code>numpy</code> array (since the classifier we use only takes numpy arrays. There are two parallel arrays, one containing the vectors (<code>train_arrays</code>) and the other containing the labels (<code>train_labels</code>).</p>
+<p>We simply put the positive ones at the first half of the array, and the negative ones at the second half.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">train_arrays = numpy.zeros((<span class="number">25000</span>, <span class="number">100</span>))</span><br><span class="line">train_labels = numpy.zeros(<span class="number">25000</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">12500</span>):</span><br><span class="line">    prefix_train_pos = <span class="string">'TRAIN_POS_'</span> + str(i)</span><br><span class="line">    prefix_train_neg = <span class="string">'TRAIN_NEG_'</span> + str(i)</span><br><span class="line">    train_arrays[i] = model[prefix_train_pos]</span><br><span class="line">    train_arrays[<span class="number">12500</span> + i] = model[prefix_train_neg]</span><br><span class="line">    train_labels[i] = <span class="number">1</span></span><br><span class="line">    train_labels[<span class="number">12500</span> + i] = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>The training array looks like this: rows and rows of vectors representing each sentence.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">print</span> train_arrays</span><br><span class="line"></span><br><span class="line">[[ <span class="number">0.42028627</span> -<span class="number">0.0910796</span>  -<span class="number">0.10316094</span> ..., -<span class="number">0.11574443</span>  <span class="number">0.54547763</span></span><br><span class="line">  -<span class="number">0.1086079</span> ]</span><br><span class="line"> [ <span class="number">0.21860494</span>  <span class="number">0.34468749</span> -<span class="number">0.06821636</span> ..., -<span class="number">0.02118306</span>  <span class="number">0.39692196</span></span><br><span class="line">   <span class="number">0.518085</span>  ]</span><br><span class="line"> [ <span class="number">0.19905667</span> -<span class="number">0.05517581</span>  <span class="number">0.0789782</span>  ...,  <span class="number">0.78548694</span>  <span class="number">0.10369277</span></span><br><span class="line">   <span class="number">0.15604787</span>]</span><br><span class="line"> ..., </span><br><span class="line"> [ <span class="number">0.42894334</span> -<span class="number">0.03023763</span> -<span class="number">0.38231012</span> ...,  <span class="number">0.17735066</span>  <span class="number">0.36474037</span></span><br><span class="line">  -<span class="number">0.08756389</span>]</span><br><span class="line"> [ <span class="number">0.65340477</span>  <span class="number">0.388024</span>   -<span class="number">0.34454256</span> ...,  <span class="number">0.0466847</span>   <span class="number">0.61409295</span></span><br><span class="line">   <span class="number">0.19534792</span>]</span><br><span class="line"> [ <span class="number">0.40329584</span>  <span class="number">0.26531416</span> -<span class="number">0.11242788</span> ...,  <span class="number">0.08738184</span>  <span class="number">0.48685795</span></span><br><span class="line">  -<span class="number">0.17476116</span>]]</span><br></pre></td></tr></table></figure>
+<p>The labels are simply category labels for the sentence vectors — 1 representing positive and 0 for negative.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">print</span> train_labels</span><br><span class="line"></span><br><span class="line">[ <span class="number">1.</span>  <span class="number">1.</span>  <span class="number">1.</span> ...,  <span class="number">0.</span>  <span class="number">0.</span>  <span class="number">0.</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="Testing_Vectors">Testing Vectors</h3><p>We do the same for testing data — data that we are going to feed to the classifier after we’ve trained it using the training data. This allows us to evaluate our results. The process is pretty much the same as extracting the results for the training data.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">test_arrays = numpy.zeros((<span class="number">25000</span>, <span class="number">100</span>))</span><br><span class="line">test_labels = numpy.zeros(<span class="number">25000</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">12500</span>):</span><br><span class="line">    prefix_test_pos = <span class="string">'TEST_POS_'</span> + str(i)</span><br><span class="line">    prefix_test_neg = <span class="string">'TEST_NEG_'</span> + str(i)</span><br><span class="line">    test_arrays[i] = model[prefix_test_pos]</span><br><span class="line">    test_arrays[<span class="number">12500</span> + i] = model[prefix_test_neg]</span><br><span class="line">    test_labels[i] = <span class="number">1</span></span><br><span class="line">    test_labels[<span class="number">12500</span> + i] = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h3 id="Classification">Classification</h3><p>Now we train a logistic regression classifier using the training data.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">classifier = LogisticRegression()</span><br><span class="line">classifier.fit(train_arrays, train_labels)</span><br><span class="line"></span><br><span class="line">LogisticRegression(C=<span class="number">1.0</span>, class_weight=<span class="keyword">None</span>, dual=<span class="keyword">False</span>, fit_intercept=<span class="keyword">True</span>,</span><br><span class="line">          intercept_scaling=<span class="number">1</span>, penalty=<span class="string">'l2'</span>, random_state=<span class="keyword">None</span>, tol=<span class="number">0.0001</span>)</span><br></pre></td></tr></table></figure>
+<p>And find that we have achieved near 87% accuracy for sentiment analysis. This is rather incredible, given that we are only using a linear SVM and a very shallow neural network.</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">classifier.<span class="function"><span class="title">score</span><span class="params">(test_arrays, test_labels)</span></span></span><br><span class="line"></span><br><span class="line"><span class="number">0.86968000000000001</span></span><br></pre></td></tr></table></figure>
+<p>Isn’t this fantastic? Hope I saved you some time!</p>
+<h2 id="References">References</h2><ul>
+<li>Doc2vec: <a href="https://radimrehurek.com/gensim/models/doc2vec.html" target="_blank" rel="external">https://radimrehurek.com/gensim/models/doc2vec.html</a></li>
+<li>Paper that inspired this: <a href="http://arxiv.org/abs/1405.4053" target="_blank" rel="external">http://arxiv.org/abs/1405.4053</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/05/20/word2vec-sentiment/" data-id="ci9weoqz400001hs12tizn48y" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+  
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2015/05/20/word2vec-sentiment/">Sentiment Analysis using Doc2Vec</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 Linan Qiu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>
