@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Getting Numpy on EC2 | Pandamonium</title>
+  <meta name="description" content="Musings of a Panda" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="Pandamonium">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+            
+            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
+            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
+        </div>
+    </div>
+</header>
+
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2015-06-17T04:48:14.000Z" itemprop="datePublished">
+          2015-06-17
+      </time>
+    
+</span>
+    <h1 class="post-title">Getting Numpy on EC2</h1>
+    <section class="post-content">
+      <p>After spending around half an hour trying to install <code>numpy</code> on Amazon Linux EC2, this <a href="http://stackoverflow.com/a/25456990" target="_blank" rel="external">StackOverflow answer</a> saved me</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo yum -y install gcc-c++ python27-devel atlas-sse3-devel lapack-devel</span><br><span class="line">wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.2.tar.gz</span><br><span class="line">tar xzf virtualenv-1.11.2.tar.gz </span><br><span class="line">python27 virtualenv-1.11.2/virtualenv.py sk-learn</span><br><span class="line">. sk-learn/bin/activate</span><br><span class="line">pip install numpy</span><br></pre></td></tr></table></figure>
+<p>Simply run and grab coffee.</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Linan Qiu</h4>
+    <p>A panda that eats bamboo and bashes keyboards.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2015/06/17/ec2-numpy/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2015/06/17/ec2-numpy/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2015/06/17/ec2-numpy/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2015/07/09/greece-cash/">
+        ← If Greece Ran on Digital Currency
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2015/05/20/class-score-analysis/">
+        Class Score Analysis for CS 3134 Data Structures →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-66827435-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+
+
+
+
+</body>
+</html>

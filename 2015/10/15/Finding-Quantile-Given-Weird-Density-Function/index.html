@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Finding Quantile Given Weird Density Function | Pandamonium</title>
+  <meta name="description" content="Musings of a Panda" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="Pandamonium">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+            
+            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
+            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
+        </div>
+    </div>
+</header>
+
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2015-10-15T20:27:46.000Z" itemprop="datePublished">
+          2015-10-15
+      </time>
+    
+</span>
+    <h1 class="post-title">Finding Quantile Given Weird Density Function</h1>
+    <section class="post-content">
+      <p>For one of my Statistical Finance homeworks, I had to solve this question.</p>
+<p>Given a density function $f(x)$, where</p>
+<p>$$f(x) = \int_{-\infty}^{\infty} \frac{1}{Z} \frac{|x+1|}{(x^2+1)^2} = 1$$</p>
+<p>Find the quantile $y$ that satisfies the $F^{-1}(y) = 0.95$ where $F(x)$ is the cumulative ditribution function of $f(x)$ and $F^{-1}$ is the quantile function (the inverse of $F$).</p>
+<p>Obviously that’d mean that $F(x) = \int f(x) \: dx$ and I should start by integrating $f(x)$ and then finding its inverse. However, upon visual inspection, one should see that $f(x)$ is a bitch to integrate.</p>
+<p>Yes it is possible to integrate it by splitting the ranges for the absolute function, then splitting $(x+1) = x + 1$, then $\frac{x}{(x^2+1)^2}$ can be integrated by substitution of $u = x^2+1$ and the other portion can be done trigonometrically. Now because my integration-fu is too bad, let me solve for this numerically. So here’s the trick to (ab)use <code>R</code>.</p>
+<p>First let’s solve for $Z$. Since $f(x)$ is a density function, then by definition of density functions, $\int_{-\infty}^\infty f(x) \: dx = 1$. Then,</p>
+<p>$$Z = \int_{-\infty}^{\infty} \frac{|x+1|}{(x^2+1)^2} = 1.785398$$</p>
+<p>Great! Now let’s move to <code>R</code>. Unfortunately, <code>R</code> does not have a function for numerical computation of quantiles for arbitrary distribution functions. However, we can build one.</p>
+<p>Finding $y$ above is equivalent to the following optimization problem:</p>
+<p>$$y^* = \arg\min_{y} (F(y) - 0.95)^2$$</p>
+<p>Then all we need is an optimization routine to find $y$ that minimizes the squared error $F(y) - 0.95)^2$. In <code>R</code> there exists the library <code>nlminb</code> for numerical optimization. The functions are below:</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">CDF = <span class="keyword">function</span> (x, dist) &#123;</span><br><span class="line">  integrate(f = dist, lower = -<span class="literal">Inf</span>, upper = x)$value</span><br><span class="line">&#125;</span><br><span class="line">objective = <span class="keyword">function</span> (x, quantile, dist) &#123;</span><br><span class="line">  (CDF(x, dist) - quantile)^<span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line">find_quantile = <span class="keyword">function</span> (dist, quantile) &#123;</span><br><span class="line">  result = nlminb(start = <span class="number">0</span>, objective = objective, quantile = quantile, dist = dist)$par</span><br><span class="line">  <span class="keyword">return</span> (result)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">crazy_eqn = <span class="keyword">function</span> (x) &#123;</span><br><span class="line">  abs(x+<span class="number">1</span>)/((x^<span class="number">2</span>+<span class="number">1</span>)^<span class="number">2</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">z = integrate(crazy_eqn, lower=-<span class="literal">Inf</span>, upper=<span class="literal">Inf</span>)</span><br><span class="line"></span><br><span class="line">crazy_eqn_to_integrate = <span class="keyword">function</span>(x) &#123;</span><br><span class="line">  z$value * (abs(x+<span class="number">1</span>)/((x^<span class="number">2</span>+<span class="number">1</span>)^<span class="number">2</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">y = find_quantile(dist = crazy_eqn_to_integrate, quantile = <span class="number">0.95</span>)</span><br></pre></td></tr></table></figure>
+<p>Using this, we find that $y = 0.03161596$. Let’s check this!</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">integrate(crazy_eqn_to_integrate, lower=-<span class="literal">Inf</span>, upper=alpha)</span><br><span class="line"><span class="number">0.95</span> with absolute error &lt; <span class="number">1.8e-11</span></span><br></pre></td></tr></table></figure>
+<p>Booyah. This is why I’m not a statistics major.</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Linan Qiu</h4>
+    <p>A panda that eats bamboo and bashes keyboards.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2015/10/15/Finding-Quantile-Given-Weird-Density-Function/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2015/10/15/Finding-Quantile-Given-Weird-Density-Function/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2015/10/15/Finding-Quantile-Given-Weird-Density-Function/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2015/10/26/Binomial-European-Option-Pricing-in-R/">
+        ← Binomial European Option Pricing in R
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2015/10/13/Python-on-EC2/">
+        Python on EC2 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-66827435-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+
+
+
+
+</body>
+</html>

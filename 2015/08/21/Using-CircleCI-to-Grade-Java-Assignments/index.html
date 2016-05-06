@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Using CircleCI to Grade Java Assignments | Pandamonium</title>
+  <meta name="description" content="Musings of a Panda" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="Pandamonium">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+            
+            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
+            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
+        </div>
+    </div>
+</header>
+
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2015-08-21T18:51:24.000Z" itemprop="datePublished">
+          2015-08-21
+      </time>
+    
+</span>
+    <h1 class="post-title">Using CircleCI to Grade Java Assignments</h1>
+    <section class="post-content">
+      <p>It’s ridiculous we don’t have a proper solution that uses Continuous Integration (CI) to grade homeworks hosted on GitHub.</p>
+<p>CI, in short, is just a server that runs unit tests on your code every time you commit it. That means instead of you having to run unit tests before your commit your code (or manually run them after you commit them), a little robot checks your code against your unit tests every time you commit the code. That little robot never gets tired, doesn’t need to be fed. In short, these little robots are way better than human Teaching Assistants (TAs) (who in contrast, need to be fed pizza).</p>
+<p>Given that I’ll be Head TAing a class with nearly 300 students this fall, I can’t afford enough pizzas to keep my team running. Or maybe I can, but I prefer not to. So why not get CI servers to grade homeworks? That requires two things:</p>
+<ol>
+<li>Getting students on GitHub (and submitting homeworks via GitHub)</li>
+<li>Grading those homeworks on GitHub</li>
+</ol>
+<p>I’ll talk about (1) in a later post when I have the system fully set up, but basically it involves playing nice to GitHub and getting a team with lots and lots of private repositories. Then you give each student one private repository (so that they can’t copy. But then again, since they’re all on GitHub, it should be easy to implement a cheat check. That’s for next time).</p>
+<h2 id="Homework-Assignment"><a href="#Homework-Assignment" class="headerlink" title="Homework Assignment"></a>Homework Assignment</h2><p>Let’s say that the student is supposed to write an assignment like this:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FibonacciRecursive</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(fibonacci(<span class="number">5</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">fibonacci</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// this is the method that student codes up</span></span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This happens in a file called <code>FibonacciRecursive.java</code>. (Wow surprise).</p>
+<p>This is usually one of the first assignments in a data structures class or a last assignment in an intro programming class. Whatever it is, we can be sure of the following:</p>
+<ol>
+<li>You do not want to introduce unnecessary files into the homework package that the student works with. This confuses a student easily, and no good packaging software exists for Java which is as simple and intuitive as Grunt or NPM in JavaScript. You probably don’t want to use Maven or Ant.</li>
+<li>You probably want to avoid unit tests, since they make it difficult for you to score the entire assignment, run asynchronously, and produce rather ugly output.</li>
+</ol>
+<p>Given those two limitations, you are set back by quite a bit, since most CI servers only run well on those systems. Give it Java with Maven and CircleCI (one of the larger CI services out there that provide free CI) will work like magic. However, give it non standard stuff and it coughs blood. Unfortunately, that bloody puddle is what we have to work with.</p>
+<h2 id="Setting-up-CircleCI"><a href="#Setting-up-CircleCI" class="headerlink" title="Setting up CircleCI"></a>Setting up CircleCI</h2><p>(Side note: I chose CircleCI not TravisCI because Circle allows for private repositories while Travis insists on public).</p>
+<p>Without a single unit test command, we have to be a little hacky with CircleCI. Now here’s how CircleCI runs in a nutshell:</p>
+<ol>
+<li>CircleCI reads off <code>circle.yml</code> in your repository. If it finds that file, it follows the instructions in that file. Otherwise, it tries to infer your environment (be it some Ruby thingum, Maven for Java, or Grunt for JS).</li>
+<li>It runs the commands in <code>circle.yml</code> or the inferred commands.</li>
+<li>Specifically, in the unit test portion, it runs every command in the unit test portion. If all of them produces an exit code of 0 (that means everything’s good), the unit tests pass. If any of them produce a non-0 exit code, unit tests fail, you get an error.</li>
+<li>The results of these get emailed to you.</li>
+</ol>
+<p>That sounds cool right? So let’s start appropriating that system for homework grading.</p>
+<h2 id="Game-Plan"><a href="#Game-Plan" class="headerlink" title="Game Plan"></a>Game Plan</h2><p>Your directory will end up containing</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- FibonacciRecursive.java</span><br><span class="line">- Grader.java</span><br><span class="line">- build.sh</span><br><span class="line">- circle.yml</span><br></pre></td></tr></table></figure>
+<p>Here’s how everything works:</p>
+<ol>
+<li>CircleCI reads <code>circle.yml</code> which tells the server to run <code>build.sh</code> instead of running standard unit tests</li>
+<li><code>build.sh</code> does the following<ol>
+<li>It tries to compile <code>FibonacciRecursive.java</code> and <code>Grader.java</code></li>
+<li>It runs Grader (now compiled as a class). Grader runs a series of tests on FibonacciRecursive, printing out the score that the student receives along each step. Depending on the score, Grader returns with an exit code of either 0 or 1.</li>
+</ol>
+</li>
+<li><code>build.sh</code> returns whatever exit code Grader returns.</li>
+<li>CircleCI consumes that exit code.</li>
+</ol>
+<p>And this is how we’ll abuse CircleCI to grade homeworks.</p>
+<h2 id="Overriding-circle-yml"><a href="#Overriding-circle-yml" class="headerlink" title="Overriding circle.yml"></a>Overriding <code>circle.yml</code></h2><p>We know that we have to override <code>circle.yml</code> to not try and run Maven / Ant / freeze up and die when we run our custom Java stuff. What’s simpler than making it run a <code>.sh</code> script?</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## Customize the test machine</span></span><br><span class="line"><span class="attr">machine:</span></span><br><span class="line">  <span class="comment"># Version of java to use</span></span><br><span class="line"><span class="attr">  java:</span></span><br><span class="line"><span class="attr">    version:</span> oraclejdk8</span><br><span class="line"></span><br><span class="line"><span class="comment">## Customize test commands</span></span><br><span class="line"><span class="attr">test:</span></span><br><span class="line"><span class="attr">  override:</span></span><br><span class="line"><span class="bullet">    -</span> sh build.sh</span><br></pre></td></tr></table></figure>
+<p>That’s all that should go into your <code>circle.yml</code>.</p>
+<h2 id="Creating-build-sh"><a href="#Creating-build-sh" class="headerlink" title="Creating build.sh"></a>Creating <code>build.sh</code></h2><p>Now your <code>build.sh</code> should just compile every <code>.java</code> file in your directory and run Grader. So that’s exactly what it does:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">javac *.java</span><br><span class="line">java Grader</span><br><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
+<h2 id="Creating-a-Grader-Tool-in-Java"><a href="#Creating-a-Grader-Tool-in-Java" class="headerlink" title="Creating a Grader Tool in Java"></a>Creating a Grader Tool in Java</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Grader</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> score = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> scoreMax = <span class="number">50</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Fibonacci</span></span><br><span class="line">        <span class="comment">// Test 0</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">0</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 1 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test 1</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 2 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test 5</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">5</span>) == <span class="number">5</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 3 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test 10</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">10</span>) == <span class="number">55</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 4 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test -1</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(-<span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 5 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (score != scoreMax) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Score: "</span> + score + <span class="string">"/"</span> + scoreMax);</span><br><span class="line">            System.exit(<span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"Score: "</span> + score + <span class="string">"/"</span> + scoreMax);</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This should be rather self explanatory – you’re basically making a series of “assertions”, but tabulating scores at the same time.</p>
+<h2 id="Pushing-to-GitHub"><a href="#Pushing-to-GitHub" class="headerlink" title="Pushing to GitHub"></a>Pushing to GitHub</h2><p>We push all this code to a GitHub repository:</p>
+<p><a href="https://github.com/linanqiu/circle-ci-java-assignment-grading" target="_blank" rel="external">https://github.com/linanqiu/circle-ci-java-assignment-grading</a></p>
+<h2 id="Setting-up-CircleCI-1"><a href="#Setting-up-CircleCI-1" class="headerlink" title="Setting up CircleCI"></a>Setting up CircleCI</h2><p>Add your repository on CircleCI after you’ve set up an account.</p>
+<p><img src="/images/Using-CircleCI-to-Grade-Java-Assignments/circleci1.png" alt=""></p>
+<p><img src="/images/Using-CircleCI-to-Grade-Java-Assignments/circleci2.png" alt=""></p>
+<p>You’ll see that the build has started.</p>
+<p><img src="/images/Using-CircleCI-to-Grade-Java-Assignments/circleci3.png" alt=""></p>
+<p>And you should get the results of <code>Grader.java</code> being run on <code>FibonacciRecursive.java</code> as a result of <code>build.sh</code> being run as told by <code>circle.yml</code> (Phew)</p>
+<p><img src="/images/Using-CircleCI-to-Grade-Java-Assignments/circleci4.png" alt=""></p>
+<h2 id="Grade-On-Commit"><a href="#Grade-On-Commit" class="headerlink" title="Grade On Commit"></a>Grade On Commit</h2><p>It shows that we’ve failed the assignment and didn’t get full marks. Well obviously, since we made <code>Test 5</code> in the Grader an errorneous test. It should be producing 0 instead of 1. Let’s change that line:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Grader</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> score = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> scoreMax = <span class="number">50</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Fibonacci</span></span><br><span class="line">        <span class="comment">// Test 0</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">0</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 1 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test 1</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 2 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test 5</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">5</span>) == <span class="number">5</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 3 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test 10</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(<span class="number">10</span>) == <span class="number">55</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 4 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Test -1</span></span><br><span class="line">        <span class="comment">// Modified</span></span><br><span class="line">        <span class="keyword">if</span> (FibonacciRecursive.fibonacci(-<span class="number">1</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Test 5 Passed +10"</span>);</span><br><span class="line">            score += <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (score != scoreMax) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Score: "</span> + score + <span class="string">"/"</span> + scoreMax);</span><br><span class="line">            System.exit(<span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"Score: "</span> + score + <span class="string">"/"</span> + scoreMax);</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We make this modification, and submit. We see that CircleCI has already seen the new commit and started building it:</p>
+<p><img src="/images/Using-CircleCI-to-Grade-Java-Assignments/circleci5.png" alt=""></p>
+<p>Seems like the problem has been fixed! And this happened without us intervening (and no pizzas involved).</p>
+<p><img src="/images/Using-CircleCI-to-Grade-Java-Assignments/circleci6.png" alt=""></p>
+<p>Isn’t this awesome? Even awesome-er, CircleCI has a great API. That means you can use this to create a live scoreboard for your students / email notifications every time they submit code.</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Linan Qiu</h4>
+    <p>A panda that eats bamboo and bashes keyboards.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2015/10/07/word2vec-sentiment/">
+        ← Sentiment Analysis Using Doc2Vec
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2015/07/09/greece-cash/">
+        If Greece Ran on Digital Currency →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-66827435-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Memoization Recursion Dynamic Programming | Pandamonium</title>
+  <meta name="description" content="Musings of a Panda" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="Pandamonium">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+            
+            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
+            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
+        </div>
+    </div>
+</header>
+
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2015-12-11T04:37:45.000Z" itemprop="datePublished">
+          2015-12-10
+      </time>
+    
+</span>
+    <h1 class="post-title">Memoization Recursion Dynamic Programming</h1>
+    <section class="post-content">
+      <p>A student asked this in class today: What’s the difference between Recursion, Memoization and Dynamic Programming.</p>
+<p>I was quite surprised that said student couldn’t find a good answer online, so I made one. Here’s the answer:</p>
+<hr>
+<p>Okay. Here’s the short version: Recursion + Memoization = Dynamic Programming.</p>
+<p>Was going to go through this at recitation but wtheck. :D</p>
+<h2 id="Recursion"><a href="#Recursion" class="headerlink" title="Recursion"></a>Recursion</h2><p>Recursion is recursion is recursion but it ends somewhere. Basically, a recursive expression is one that depends on previous values of the same expression, and we have a base condition. Think Fibonacci numbers. In this case, I’m going to use the example of the coin change problem (which you’ve probably done in class).</p>
+<p>The question goes like: coins come in 35 cents, 25 cents, 15 cents, 10 cents, 5 cents, and 1 cents. So I write it like this <code>int[] combinations = new int[] {35, 25, 15, 10, 5, 1}</code>. Now given <code>x</code> cents, what’s the minimum number of coins I need?</p>
+<p>I can derive a recursive equation for this:</p>
+<p>Let’s say <code>C(x)</code> is a magical function. <code>C(x)</code> gives me the minimum number of coins required to represent <code>x</code> cents. I can define <code>C(x)</code> recursively:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">C(x) = minimum of the following &#123;</span><br><span class="line">         C(x-35) + 1,</span><br><span class="line">         C(x-25) + 1,</span><br><span class="line">         C(x-15) + 1,</span><br><span class="line">         C(x-10) + 1,</span><br><span class="line">         C(x-5) + 1,</span><br><span class="line">         C(x-1) + 1</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<p>Why? Say <code>x=105</code>. Then, the minimum number of coins required to piece together 105 cents is the minimum of</p>
+<ul>
+<li>the minimum number of coins required to piece 70 cents plus another 35 cent coin</li>
+<li>the minimum number of coins required to piece 80 cents plus another 25 cent coin</li>
+<li>the minimum number of coins required to piece 90 cents plus another 15 cent coin etc. etc.</li>
+</ul>
+<p>What about our base condition? Since the smallest denomination is 1 cent, I can define <code>C(0) = 0</code> and <code>C(1) = 1</code>. Then, the entire recursive function is basically:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">minimumCoin</span><span class="params">(<span class="keyword">int</span>[] combinations, <span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(x == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span>(x == <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  List&lt;Integer&gt; costs = <span class="keyword">new</span> LinkedList&lt;Integer&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> combination : combinations) &#123;</span><br><span class="line">    <span class="keyword">if</span>(x - combination &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">      costs.add(minimumCoin(combinations, x - combination) + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> Collections.min(costs).intValue();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Memoization"><a href="#Memoization" class="headerlink" title="Memoization"></a>Memoization</h2><p>The problem with this is that you’re doing a lot of repeat work. Let’s do a trace:</p>
+<ul>
+<li>To calculate C(105), you need C(70, 80, 90, 95, 100, 104).</li>
+<li>For each of those, you’d need more values.</li>
+</ul>
+<p>Convince yourself that those values repeat by drawing up a giant tree. You’re doing a lot of duplicate work. This is basically the same reason why Fibonacci recursion is so inefficient.</p>
+<p>The reason is because naive recursion is forgetful. You only remember results for the current layer, and that’s it. Instead, what if there’s a way to remember all the past results that you’ve had so far? Memoization is exactly that.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">minimumCoin</span><span class="params">(<span class="keyword">int</span>[] combinations, <span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span>[] memory = <span class="keyword">new</span> <span class="keyword">int</span>[x + <span class="number">1</span>];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; memory.length; i++) &#123;</span><br><span class="line">    memory[i] = Integer.MIN_VALUE;</span><br><span class="line">  &#125;</span><br><span class="line">  minimumCoin(combinations, x, memory);</span><br><span class="line">  <span class="keyword">return</span> memory[x];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">minimumCoin</span><span class="params">(<span class="keyword">int</span>[] combinations, <span class="keyword">int</span> x, <span class="keyword">int</span>[] memory)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (x == <span class="number">0</span>) &#123;</span><br><span class="line">    memory[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (x == <span class="number">1</span>) &#123;</span><br><span class="line">    memory[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  List&lt;Integer&gt; costs = <span class="keyword">new</span> LinkedList&lt;Integer&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> combination : combinations) &#123;</span><br><span class="line">    <span class="keyword">if</span> (x - combination &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (memory[x - combination] == Integer.MIN_VALUE) &#123;</span><br><span class="line">        minimumCoin(combinations, x - combination, memory);</span><br><span class="line">      &#125;</span><br><span class="line">      costs.add(memory[x - combination] + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  memory[x] = Collections.min(costs).intValue();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The only major difference between this and the previous recursive solution is that instead of recursing down <code>costs.add(minimumCoin(combinations, x - combination) + 1)</code> every single time, we check if this value has been calculated before in <code>int[] memory</code>. If it has, we just take the value straightaway instead of calculating it. We only calculate if it hasn’t been calculated (ie. still equals to the initial value of <code>Integer.MAX_VALUE</code>).</p>
+<p>This is memoization.</p>
+<h2 id="Dynamic-Programming"><a href="#Dynamic-Programming" class="headerlink" title="Dynamic Programming"></a>Dynamic Programming</h2><p>So DP really comprises of two parts:</p>
+<ul>
+<li>Getting a recursive equation</li>
+<li>Coming up with a memoized way to do this</li>
+</ul>
+<p>Usually, the memoized solution is way easier to write <strong>iteratively</strong> than recursively. I just stuck to recursion in this case to extend from the original recursion example. Plus, providing you with the iterative solution would be too much of a giveaway.</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Linan Qiu</h4>
+    <p>A panda that eats bamboo and bashes keyboards.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2015/12/10/Memoization-Recursion-Dynamic-Programming/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2015/12/10/Memoization-Recursion-Dynamic-Programming/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2015/12/10/Memoization-Recursion-Dynamic-Programming/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2016/01/04/Grades/">
+        ← Grades
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2015/12/03/pca-irs/">
+        Principal Component Analysis on Interest Rate Swaps →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-66827435-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+
+
+
+
+</body>
+</html>
