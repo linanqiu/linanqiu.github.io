@@ -86,18 +86,192 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">import</span> pandas</span><br></pre></td></tr></table></figure>
 <h1 id="Parsing-Data"><a href="#Parsing-Data" class="headerlink" title="Parsing Data"></a>Parsing Data</h1><p>Earlier, I only scraped the raw data from the pages. Hence, I only have the <code>receipt</code> (receipt number), <code>title</code> (the short line of text displayed at the top of each case status) and <code>text</code> (the full text of the case status). This is hardly useful. Here’s what the raw data looks like:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">data_eac = pandas.read_csv(<span class="string">'raw_data_eac.csv'</span>)</span><br><span class="line">data_ysc = pandas.read_csv(<span class="string">'raw_data_ysc.csv'</span>)</span><br><span class="line">data = data_eac.append(data_ysc)</span><br></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data</span><br></pre></td></tr></table></figure>
-<div><br><table border="1" class="dataframe"><br>  <thead><br>    <tr style="text-align: right;"><br>      <th></th><br>      <th>receipt</th><br>      <th>title</th><br>      <th>text</th><br>    </tr><br>  </thead><br>  <tbody><br>    <tr><br>      <th>0</th><br>      <td>EAC1690120011</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>1</th><br>      <td>EAC1690120006</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>2</th><br>      <td>EAC1690120001</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>3</th><br>      <td>EAC1690120003</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 11, 2016, we transferred your Form I-…</td><br>    </tr><br>    <tr><br>      <th>4</th><br>      <td>EAC1690120002</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>5</th><br>      <td>EAC1690120009</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>6</th><br>      <td>EAC1690120012</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 13, 2016, the Post Office delivered you…</td><br>    </tr><br>    <tr><br>      <th>7</th><br>      <td>EAC1690120010</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>8</th><br>      <td>EAC1690120000</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>9</th><br>      <td>EAC1690120004</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>10</th><br>      <td>EAC1690120019</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>11</th><br>      <td>EAC1690120029</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 2, 2016, the Post Office delivered your…</td><br>    </tr><br>    <tr><br>      <th>12</th><br>      <td>EAC1690120018</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>13</th><br>      <td>EAC1690120022</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>14</th><br>      <td>EAC1690120014</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>15</th><br>      <td>EAC1690120021</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>16</th><br>      <td>EAC1690120028</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>17</th><br>      <td>EAC1690120038</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On April 16, 2016, the Post Office delivered y…</td><br>    </tr><br>    <tr><br>      <th>18</th><br>      <td>EAC1690120032</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On April 20, 2016, the Post Office delivered y…</td><br>    </tr><br>    <tr><br>      <th>19</th><br>      <td>EAC1690120013</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>20</th><br>      <td>EAC1690120008</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>21</th><br>      <td>EAC1690120027</td><br>      <td>Case Was Approved</td><br>      <td>On April 29, 2016, we approved your Form I-765…</td><br>    </tr><br>    <tr><br>      <th>22</th><br>      <td>EAC1690120049</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>23</th><br>      <td>EAC1690120050</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 20, 2016, the Post Office delivered you…</td><br>    </tr><br>    <tr><br>      <th>24</th><br>      <td>EAC1690120039</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>25</th><br>      <td>EAC1690120007</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>26</th><br>      <td>EAC1690120024</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>27</th><br>      <td>EAC1690120017</td><br>      <td>Case Was Received</td><br>      <td>On February 22, 2016, we received your Form I-…</td><br>    </tr><br>    <tr><br>      <th>28</th><br>      <td>EAC1690120015</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>    </tr><br>    <tr><br>      <th>29</th><br>      <td>EAC1690120034</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 20, 2016, the Post Office delivered you…</td><br>    </tr><br>    <tr><br>      <th>…</th><br>      <td>…</td><br>      <td>…</td><br>      <td>…</td><br>    </tr><br>    <tr><br>      <th>72565</th><br>      <td>YSC1690079974</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72566</th><br>      <td>YSC1690079984</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72567</th><br>      <td>YSC1690079954</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72568</th><br>      <td>YSC1690079977</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72569</th><br>      <td>YSC1690079997</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72570</th><br>      <td>YSC1690079965</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72571</th><br>      <td>YSC1690079978</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72572</th><br>      <td>YSC1690079995</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72573</th><br>      <td>YSC1690079987</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72574</th><br>      <td>YSC1690079975</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72575</th><br>      <td>YSC1690079996</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72576</th><br>      <td>YSC1690079970</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72577</th><br>      <td>YSC1690079979</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72578</th><br>      <td>YSC1690079994</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72579</th><br>      <td>YSC1690079992</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72580</th><br>      <td>YSC1690079985</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72581</th><br>      <td>YSC1690079989</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72582</th><br>      <td>YSC1690079908</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72583</th><br>      <td>YSC1690079971</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72584</th><br>      <td>YSC1690079990</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72585</th><br>      <td>YSC1690079999</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72586</th><br>      <td>YSC1690079988</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72587</th><br>      <td>YSC1690079958</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72588</th><br>      <td>YSC1690079956</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72589</th><br>      <td>YSC1690079955</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72590</th><br>      <td>YSC1690079981</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72591</th><br>      <td>YSC1690079969</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72592</th><br>      <td>YSC1690079986</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>    <tr><br>      <th>72593</th><br>      <td>YSC1690079966</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-130, I…</td><br>    </tr><br>    <tr><br>      <th>72594</th><br>      <td>YSC1690079998</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>    </tr><br>  </tbody><br></table><br><p>129899 rows × 3 columns</p><br></div>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(data)</span><br></pre></td></tr></table></figure>
+<pre><code>             receipt                                              title  \
+0      EAC1690120011  Case Was Transferred And A New Office Has Juri...   
+1      EAC1690120006  Case Was Transferred And A New Office Has Juri...   
+2      EAC1690120001  Case Was Transferred And A New Office Has Juri...   
+3      EAC1690120003  Case Was Transferred And A New Office Has Juri...   
+4      EAC1690120002  Case Was Transferred And A New Office Has Juri...   
+5      EAC1690120009  Case Was Transferred And A New Office Has Juri...   
+6      EAC1690120012        Card Was Delivered To Me By The Post Office   
+7      EAC1690120010  Case Was Transferred And A New Office Has Juri...   
+8      EAC1690120000  Case Was Transferred And A New Office Has Juri...   
+9      EAC1690120004  Case Was Transferred And A New Office Has Juri...   
+10     EAC1690120019  Case Was Transferred And A New Office Has Juri...   
+11     EAC1690120029        Card Was Delivered To Me By The Post Office   
+12     EAC1690120018  Case Was Transferred And A New Office Has Juri...   
+13     EAC1690120022  Case Was Transferred And A New Office Has Juri...   
+14     EAC1690120014  Case Was Transferred And A New Office Has Juri...   
+15     EAC1690120021  Case Was Transferred And A New Office Has Juri...   
+16     EAC1690120028  Case Was Transferred And A New Office Has Juri...   
+17     EAC1690120038        Card Was Delivered To Me By The Post Office   
+18     EAC1690120032        Card Was Delivered To Me By The Post Office   
+19     EAC1690120013  Case Was Transferred And A New Office Has Juri...   
+20     EAC1690120008  Case Was Transferred And A New Office Has Juri...   
+21     EAC1690120027                                  Case Was Approved   
+22     EAC1690120049  Case Was Transferred And A New Office Has Juri...   
+23     EAC1690120050        Card Was Delivered To Me By The Post Office   
+24     EAC1690120039  Case Was Transferred And A New Office Has Juri...   
+25     EAC1690120007  Case Was Transferred And A New Office Has Juri...   
+26     EAC1690120024  Case Was Transferred And A New Office Has Juri...   
+27     EAC1690120017                                  Case Was Received   
+28     EAC1690120015  Case Was Transferred And A New Office Has Juri...   
+29     EAC1690120034        Card Was Delivered To Me By The Post Office   
+...              ...                                                ...   
+72565  YSC1690079974                                  Case Was Received   
+72566  YSC1690079984                                  Case Was Received   
+72567  YSC1690079954                                  Case Was Received   
+72568  YSC1690079977                                  Case Was Received   
+72569  YSC1690079997                                  Case Was Received   
+72570  YSC1690079965                                  Case Was Received   
+72571  YSC1690079978                                  Case Was Received   
+72572  YSC1690079995                                  Case Was Received   
+72573  YSC1690079987                                  Case Was Received   
+72574  YSC1690079975                                  Case Was Received   
+72575  YSC1690079996                                  Case Was Received   
+72576  YSC1690079970                                  Case Was Received   
+72577  YSC1690079979                                  Case Was Received   
+72578  YSC1690079994                                  Case Was Received   
+72579  YSC1690079992                                  Case Was Received   
+72580  YSC1690079985                                  Case Was Received   
+72581  YSC1690079989                                  Case Was Received   
+72582  YSC1690079908                                  Case Was Received   
+72583  YSC1690079971                                  Case Was Received   
+72584  YSC1690079990                                  Case Was Received   
+72585  YSC1690079999                                  Case Was Received   
+72586  YSC1690079988                                  Case Was Received   
+72587  YSC1690079958                                  Case Was Received   
+72588  YSC1690079956                                  Case Was Received   
+72589  YSC1690079955                                  Case Was Received   
+72590  YSC1690079981                                  Case Was Received   
+72591  YSC1690079969                                  Case Was Received   
+72592  YSC1690079986                                  Case Was Received   
+72593  YSC1690079966                                  Case Was Received   
+72594  YSC1690079998                                  Case Was Received   
 
+                                                    text  
+0      On March 9, 2016, we transferred your Form I-7...  
+1      On March 9, 2016, we transferred your Form I-7...  
+2      On March 9, 2016, we transferred your Form I-7...  
+3      On March 11, 2016, we transferred your Form I-...  
+4      On March 9, 2016, we transferred your Form I-7...  
+5      On March 9, 2016, we transferred your Form I-7...  
+6      On May 13, 2016, the Post Office delivered you...  
+7      On March 9, 2016, we transferred your Form I-7...  
+8      On March 9, 2016, we transferred your Form I-7...  
+9      On March 9, 2016, we transferred your Form I-7...  
+10     On March 9, 2016, we transferred your Form I-7...  
+11     On May 2, 2016, the Post Office delivered your...  
+12     On March 9, 2016, we transferred your Form I-7...  
+13     On March 9, 2016, we transferred your Form I-7...  
+14     On March 9, 2016, we transferred your Form I-7...  
+15     On March 9, 2016, we transferred your Form I-7...  
+16     On March 9, 2016, we transferred your Form I-7...  
+17     On April 16, 2016, the Post Office delivered y...  
+18     On April 20, 2016, the Post Office delivered y...  
+19     On March 9, 2016, we transferred your Form I-7...  
+20     On March 9, 2016, we transferred your Form I-7...  
+21     On April 29, 2016, we approved your Form I-765...  
+22     On March 9, 2016, we transferred your Form I-7...  
+23     On May 20, 2016, the Post Office delivered you...  
+24     On March 9, 2016, we transferred your Form I-7...  
+25     On March 9, 2016, we transferred your Form I-7...  
+26     On March 9, 2016, we transferred your Form I-7...  
+27     On February 22, 2016, we received your Form I-...  
+28     On March 9, 2016, we transferred your Form I-7...  
+29     On May 20, 2016, the Post Office delivered you...  
+...                                                  ...  
+72565  On May 9, 2016, we received your Form I-765, A...  
+72566  On May 9, 2016, we received your Form I-765, A...  
+72567  On May 9, 2016, we received your Form I-765, A...  
+72568  On May 9, 2016, we received your Form I-765, A...  
+72569  On May 9, 2016, we received your Form I-765, A...  
+72570  On May 9, 2016, we received your Form I-765, A...  
+72571  On May 9, 2016, we received your Form I-765, A...  
+72572  On May 9, 2016, we received your Form I-765, A...  
+72573  On May 9, 2016, we received your Form I-765, A...  
+72574  On May 9, 2016, we received your Form I-765, A...  
+72575  On May 9, 2016, we received your Form I-765, A...  
+72576  On May 9, 2016, we received your Form I-765, A...  
+72577  On May 9, 2016, we received your Form I-765, A...  
+72578  On May 9, 2016, we received your Form I-765, A...  
+72579  On May 9, 2016, we received your Form I-765, A...  
+72580  On May 9, 2016, we received your Form I-765, A...  
+72581  On May 9, 2016, we received your Form I-765, A...  
+72582  On May 9, 2016, we received your Form I-765, A...  
+72583  On May 9, 2016, we received your Form I-765, A...  
+72584  On May 9, 2016, we received your Form I-765, A...  
+72585  On May 9, 2016, we received your Form I-765, A...  
+72586  On May 9, 2016, we received your Form I-765, A...  
+72587  On May 9, 2016, we received your Form I-765, A...  
+72588  On May 9, 2016, we received your Form I-765, A...  
+72589  On May 9, 2016, we received your Form I-765, A...  
+72590  On May 9, 2016, we received your Form I-765, A...  
+72591  On May 9, 2016, we received your Form I-765, A...  
+72592  On May 9, 2016, we received your Form I-765, A...  
+72593  On May 9, 2016, we received your Form I-130, I...  
+72594  On May 9, 2016, we received your Form I-765, A...  
 
-
-<p>I can use this information to create a <code>status</code> for each receipt number. I’m using a lot of simplifying assupmtions here and disregarding a lot of corner cases (USCIS sometimes requests additional evidence, does weird thing with cases etc.) In fact, let’s take a look at the vaious case <code>title</code>s:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data.groupby(<span class="string">'title'</span>).count()</span><br></pre></td></tr></table></figure>
-<div><br><table border="1" class="dataframe"><br>  <thead><br>    <tr style="text-align: right;"><br>      <th></th><br>      <th>receipt</th><br>      <th>text</th><br>      <th>status</th><br>      <th>date</th><br>    </tr><br>    <tr><br>      <th>title</th><br>      <th></th><br>      <th></th><br>      <th></th><br>      <th></th><br>    </tr><br>  </thead><br>  <tbody><br>    <tr><br>      <th>Amended Notice Was Mailed</th><br>      <td>8</td><br>      <td>8</td><br>      <td>8</td><br>      <td>8</td><br>    </tr><br>    <tr><br>      <th>Appeal Was Dismissed</th><br>      <td>9</td><br>      <td>9</td><br>      <td>9</td><br>      <td>9</td><br>    </tr><br>    <tr><br>      <th>Card Is Being Returned to USCIS by Post Office</th><br>      <td>10</td><br>      <td>10</td><br>      <td>10</td><br>      <td>10</td><br>    </tr><br>    <tr><br>      <th>Card Returned Undeliverable</th><br>      <td>4</td><br>      <td>4</td><br>      <td>4</td><br>      <td>4</td><br>    </tr><br>    <tr><br>      <th>Card Was Delivered To Me By The Post Office</th><br>      <td>11434</td><br>      <td>11435</td><br>      <td>11435</td><br>      <td>11435</td><br>    </tr><br>    <tr><br>      <th>Card Was Determined As Undeliverable By The Post Office</th><br>      <td>26</td><br>      <td>26</td><br>      <td>26</td><br>      <td>26</td><br>    </tr><br>    <tr><br>      <th>Card Was Mailed To Me</th><br>      <td>2045</td><br>      <td>2047</td><br>      <td>2047</td><br>      <td>2047</td><br>    </tr><br>    <tr><br>      <th>Card Was Picked Up By The United States Postal Service</th><br>      <td>162</td><br>      <td>162</td><br>      <td>162</td><br>      <td>162</td><br>    </tr><br>    <tr><br>      <th>Card Was Received By USCIS Along With My Letter</th><br>      <td>4</td><br>      <td>4</td><br>      <td>4</td><br>      <td>4</td><br>    </tr><br>    <tr><br>      <th>Card Was Returned And USCIS Is Holding It For One Year</th><br>      <td>20</td><br>      <td>20</td><br>      <td>20</td><br>      <td>20</td><br>    </tr><br>    <tr><br>      <th>Card Was Returned To USCIS By Post Office</th><br>      <td>7</td><br>      <td>7</td><br>      <td>7</td><br>      <td>7</td><br>    </tr><br>    <tr><br>      <th>Case Is Pending at a Local Office</th><br>      <td>449</td><br>      <td>449</td><br>      <td>449</td><br>      <td>449</td><br>    </tr><br>    <tr><br>      <th>Case Rejected Because I Sent An Incorrect Fee</th><br>      <td>1942</td><br>      <td>1943</td><br>      <td>1943</td><br>      <td>1943</td><br>    </tr><br>    <tr><br>      <th>Case Rejected Because The Version Of The Form I Sent Is No Longer Accepted</th><br>      <td>64</td><br>      <td>64</td><br>      <td>64</td><br>      <td>64</td><br>    </tr><br>    <tr><br>      <th>Case Rejected For Form Not Signed And Incorrect Form Version</th><br>      <td>38</td><br>      <td>38</td><br>      <td>38</td><br>      <td>38</td><br>    </tr><br>    <tr><br>      <th>Case Rejected For Incorrect Fee And Form Not Signed</th><br>      <td>94</td><br>      <td>94</td><br>      <td>94</td><br>      <td>94</td><br>    </tr><br>    <tr><br>      <th>Case Rejected For Incorrect Fee, Payment Not Signed And Incorrect Form Version</th><br>      <td>10</td><br>      <td>10</td><br>      <td>10</td><br>      <td>10</td><br>    </tr><br>    <tr><br>      <th>Case Terminated Benefit Received By Other Means</th><br>      <td>35</td><br>      <td>36</td><br>      <td>36</td><br>      <td>36</td><br>    </tr><br>    <tr><br>      <th>Case Transferred And New Office Has Jurisdiction</th><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>    </tr><br>    <tr><br>      <th>Case Transferred To Another Office</th><br>      <td>1068</td><br>      <td>1068</td><br>      <td>1068</td><br>      <td>1068</td><br>    </tr><br>    <tr><br>      <th>Case Was Approved</th><br>      <td>4558</td><br>      <td>4562</td><br>      <td>4562</td><br>      <td>4562</td><br>    </tr><br>    <tr><br>      <th>Case Was Received</th><br>      <td>63510</td><br>      <td>63648</td><br>      <td>63648</td><br>      <td>63648</td><br>    </tr><br>    <tr><br>      <th>Case Was Received At My Local Office</th><br>      <td>6210</td><br>      <td>6212</td><br>      <td>6212</td><br>      <td>6212</td><br>    </tr><br>    <tr><br>      <th>Case Was Rejected</th><br>      <td>81</td><br>      <td>81</td><br>      <td>81</td><br>      <td>81</td><br>    </tr><br>    <tr><br>      <th>Case Was Rejected Because I Did Not Sign My Form</th><br>      <td>836</td><br>      <td>837</td><br>      <td>837</td><br>      <td>837</td><br>    </tr><br>    <tr><br>      <th>Case Was Rejected Because It Was Improperly Filed</th><br>      <td>1291</td><br>      <td>1295</td><br>      <td>1295</td><br>      <td>1295</td><br>    </tr><br>    <tr><br>      <th>Case Was Reopened</th><br>      <td>11</td><br>      <td>11</td><br>      <td>11</td><br>      <td>11</td><br>    </tr><br>    <tr><br>      <th>Case Was Reopened For Reconsideration</th><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>    </tr><br>    <tr><br>      <th>Case Was Sent To The Department of State</th><br>      <td>10569</td><br>      <td>10629</td><br>      <td>10629</td><br>      <td>10629</td><br>    </tr><br>    <tr><br>      <th>Case Was Transferred And A New Office Has Jurisdiction</th><br>      <td>14926</td><br>      <td>14928</td><br>      <td>14928</td><br>      <td>14928</td><br>    </tr><br>    <tr><br>      <th>Case Was Transferred To An Asylum Office</th><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>    </tr><br>    <tr><br>      <th>Case Was Transferred To Schedule An Interview</th><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>    </tr><br>    <tr><br>      <th>Correspondence Was Received And USCIS Is Reviewing It</th><br>      <td>133</td><br>      <td>133</td><br>      <td>133</td><br>      <td>133</td><br>    </tr><br>    <tr><br>      <th>Date of Birth Was Updated</th><br>      <td>236</td><br>      <td>236</td><br>      <td>236</td><br>      <td>236</td><br>    </tr><br>    <tr><br>      <th>Decision Notice Mailed</th><br>      <td>169</td><br>      <td>169</td><br>      <td>169</td><br>      <td>169</td><br>    </tr><br>    <tr><br>      <th>Document Was Mailed To Me</th><br>      <td>2</td><br>      <td>2</td><br>      <td>2</td><br>      <td>2</td><br>    </tr><br>    <tr><br>      <th>Duplicate Notice Was Mailed</th><br>      <td>15</td><br>      <td>16</td><br>      <td>16</td><br>      <td>16</td><br>    </tr><br>    <tr><br>      <th>Fee Refund Was Mailed</th><br>      <td>2</td><br>      <td>2</td><br>      <td>2</td><br>      <td>2</td><br>    </tr><br>    <tr><br>      <th>Fee Was Not Corrected</th><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>      <td>1</td><br>    </tr><br>    <tr><br>      <th>Fee Will Be Refunded</th><br>      <td>2</td><br>      <td>2</td><br>      <td>2</td><br>      <td>2</td><br>    </tr><br>    <tr><br>      <th>Fees Were Waived</th><br>      <td>249</td><br>      <td>249</td><br>      <td>249</td><br>      <td>249</td><br>    </tr><br>    <tr><br>      <th>Fingerprint Fee Has Issues That Need To Be Fixed</th><br>      <td>8</td><br>      <td>8</td><br>      <td>8</td><br>      <td>8</td><br>    </tr><br>    <tr><br>      <th>Fingerprint Fee Was Received</th><br>      <td>577</td><br>      <td>577</td><br>      <td>577</td><br>      <td>577</td><br>    </tr><br>    <tr><br>      <th>Name Was Updated</th><br>      <td>1245</td><br>      <td>1248</td><br>      <td>1248</td><br>      <td>1248</td><br>    </tr><br>    <tr><br>      <th>New Card Is Being Produced</th><br>      <td>1862</td><br>      <td>1866</td><br>      <td>1866</td><br>      <td>1866</td><br>    </tr><br>    <tr><br>      <th>Notice Explaining USCIS’ Actions Was Mailed</th><br>      <td>179</td><br>      <td>179</td><br>      <td>179</td><br>      <td>179</td><br>    </tr><br>    <tr><br>      <th>Notice Was Returned To USCIS Because The Post Office Could Not Deliver It</th><br>      <td>365</td><br>      <td>368</td><br>      <td>368</td><br>      <td>368</td><br>    </tr><br>    <tr><br>      <th>Payment Fee Was Returned For Insufficient Funds</th><br>      <td>41</td><br>      <td>41</td><br>      <td>41</td><br>      <td>41</td><br>    </tr><br>    <tr><br>      <th>Receipt Notice Was Changed</th><br>      <td>58</td><br>      <td>58</td><br>      <td>58</td><br>      <td>58</td><br>    </tr><br>    <tr><br>      <th>Request for Additional Evidence Was Mailed</th><br>      <td>861</td><br>      <td>862</td><br>      <td>862</td><br>      <td>862</td><br>    </tr><br>    <tr><br>      <th>Request for Initial Evidence Was Mailed</th><br>      <td>3262</td><br>      <td>3274</td><br>      <td>3274</td><br>      <td>3274</td><br>    </tr><br>    <tr><br>      <th>Response To USCIS’ Request For Evidence Was Received</th><br>      <td>940</td><br>      <td>942</td><br>      <td>942</td><br>      <td>942</td><br>    </tr><br>    <tr><br>      <th>Withdrawal Acknowledgement Notice Was Sent</th><br>      <td>24</td><br>      <td>25</td><br>      <td>25</td><br>      <td>25</td><br>    </tr><br>  </tbody><br></table><br></div>
-
-
-
-<p>I ignore most of the corner cases and only look at a few larger categories:</p>
+[129899 rows x 3 columns]
+</code></pre><p>I can use this information to create a <code>status</code> for each receipt number. I’m using a lot of simplifying assupmtions here and disregarding a lot of corner cases (USCIS sometimes requests additional evidence, does weird thing with cases etc.) In fact, let’s take a look at the vaious case <code>title</code>s:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(data.groupby(<span class="string">'title'</span>).count()[<span class="string">'receipt'</span>])</span><br></pre></td></tr></table></figure>
+<pre><code>title
+Amended Notice Was Mailed                                                             8
+Appeal Was Dismissed                                                                  9
+Card Is Being Returned to USCIS by Post Office                                       10
+Card Returned Undeliverable                                                           4
+Card Was Delivered To Me By The Post Office                                       11434
+Card Was Determined As Undeliverable By The Post Office                              26
+Card Was Mailed To Me                                                              2045
+Card Was Picked Up By The United States Postal Service                              162
+Card Was Received By USCIS Along With My Letter                                       4
+Card Was Returned And USCIS Is Holding It For One Year                               20
+Card Was Returned To USCIS By Post Office                                             7
+Case Is Pending at a Local Office                                                   449
+Case Rejected Because I Sent An Incorrect Fee                                      1942
+Case Rejected Because The Version Of The Form I Sent Is No Longer Accepted           64
+Case Rejected For Form Not Signed And Incorrect Form Version                         38
+Case Rejected For Incorrect Fee And Form Not Signed                                  94
+Case Rejected For Incorrect Fee, Payment Not Signed And Incorrect Form Version       10
+Case Terminated Benefit Received By Other Means                                      35
+Case Transferred And New Office Has Jurisdiction                                      1
+Case Transferred To Another Office                                                 1068
+Case Was Approved                                                                  4558
+Case Was Received                                                                 63510
+Case Was Received At My Local Office                                               6210
+Case Was Rejected                                                                    81
+Case Was Rejected Because I Did Not Sign My Form                                    836
+Case Was Rejected Because It Was Improperly Filed                                  1291
+Case Was Reopened                                                                    11
+Case Was Reopened For Reconsideration                                                 1
+Case Was Sent To The Department of State                                          10569
+Case Was Transferred And A New Office Has Jurisdiction                            14926
+Case Was Transferred To An Asylum Office                                              1
+Case Was Transferred To Schedule An Interview                                         1
+Correspondence Was Received And USCIS Is Reviewing It                               133
+Date of Birth Was Updated                                                           236
+Decision Notice Mailed                                                              169
+Document Was Mailed To Me                                                             2
+Duplicate Notice Was Mailed                                                          15
+Fee Refund Was Mailed                                                                 2
+Fee Was Not Corrected                                                                 1
+Fee Will Be Refunded                                                                  2
+Fees Were Waived                                                                    249
+Fingerprint Fee Has Issues That Need To Be Fixed                                      8
+Fingerprint Fee Was Received                                                        577
+Name Was Updated                                                                   1245
+New Card Is Being Produced                                                         1862
+Notice Explaining USCIS&apos; Actions Was Mailed                                         179
+Notice Was Returned To USCIS Because The Post Office Could Not Deliver It           365
+Payment Fee Was Returned For Insufficient Funds                                      41
+Receipt Notice Was Changed                                                           58
+Request for Additional Evidence Was Mailed                                          861
+Request for Initial Evidence Was Mailed                                            3262
+Response To USCIS&apos; Request For Evidence Was Received                                940
+Withdrawal Acknowledgement Notice Was Sent                                           24
+Name: receipt, dtype: int64
+</code></pre><p>I ignore most of the corner cases and only look at a few larger categories:</p>
 <ul>
 <li>If the word <code>I-765</code> appears in the <code>text</code> of a case (since we are only looking at OPT cases), and <code>Case Was Received</code> is in the <code>title</code>, then the case is still processing. This happens when USCIS receives the case. Most people enduring the long 60 to 90 day wait will see this.</li>
 <li>If the word <code>I-765</code> appears in the <code>text</code> of a case, and <code>Case Was Transferred</code> is in the <code>title</code>, then the case was probably submitted to the Vermont office first then routed to the Potomac office. This is still <code>processing</code> as well.</li>
@@ -110,16 +284,202 @@
 <p>Now here’s a slightly harder part. Only in the <code>Case Was Received</code> cases do we have a <strong>submission date</strong> for the OPT application. For the others (approved or rejected) the case status <code>text</code> only contains the date that the case was approved (which I am really not interested in for now). I want to know when those cases are <strong>submitted</strong>. Fortunately, I can again exploit the fact that the numbers are in increasing order. When the date of a case cannot be determined, I simply look backwards (to earlier receipt numbers) to the last known date of a still processing case. This gives me a good approximation of the submission dates of approved / rejected cases.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> numpy</span><br><span class="line">pattern = re.compile(<span class="string">'On ([A-z]+ [0-9]+, [0-9]+),'</span>)</span><br><span class="line"></span><br><span class="line">last_date = <span class="keyword">None</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">extract_date</span><span class="params">(row)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> row[<span class="string">'status'</span>] == <span class="string">'processing'</span>:</span><br><span class="line">        m = pattern.search(row[<span class="string">'text'</span>])</span><br><span class="line">        <span class="keyword">global</span> last_date</span><br><span class="line">        last_date = numpy.datetime64(pandas.Timestamp(m.group(<span class="number">1</span>)))</span><br><span class="line">        <span class="keyword">return</span> last_date</span><br><span class="line">    <span class="keyword">return</span> last_date</span><br><span class="line"></span><br><span class="line">data[<span class="string">'date'</span>] = data.apply(extract_date, axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
 <p>Our processed data looks like this:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data</span><br></pre></td></tr></table></figure>
-<div><br><table border="1" class="dataframe"><br>  <thead><br>    <tr style="text-align: right;"><br>      <th></th><br>      <th>receipt</th><br>      <th>title</th><br>      <th>text</th><br>      <th>status</th><br>      <th>date</th><br>    </tr><br>  </thead><br>  <tbody><br>    <tr><br>      <th>0</th><br>      <td>EAC1690120011</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>1</th><br>      <td>EAC1690120006</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>2</th><br>      <td>EAC1690120001</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>3</th><br>      <td>EAC1690120003</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 11, 2016, we transferred your Form I-…</td><br>      <td>processing</td><br>      <td>2016-03-11</td><br>    </tr><br>    <tr><br>      <th>4</th><br>      <td>EAC1690120002</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>5</th><br>      <td>EAC1690120009</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>6</th><br>      <td>EAC1690120012</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 13, 2016, the Post Office delivered you…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>7</th><br>      <td>EAC1690120010</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>8</th><br>      <td>EAC1690120000</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>9</th><br>      <td>EAC1690120004</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>10</th><br>      <td>EAC1690120019</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>11</th><br>      <td>EAC1690120029</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 2, 2016, the Post Office delivered your…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>12</th><br>      <td>EAC1690120018</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>13</th><br>      <td>EAC1690120022</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>14</th><br>      <td>EAC1690120014</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>15</th><br>      <td>EAC1690120021</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>16</th><br>      <td>EAC1690120028</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>17</th><br>      <td>EAC1690120038</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On April 16, 2016, the Post Office delivered y…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>18</th><br>      <td>EAC1690120032</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On April 20, 2016, the Post Office delivered y…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>19</th><br>      <td>EAC1690120013</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>20</th><br>      <td>EAC1690120008</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>21</th><br>      <td>EAC1690120027</td><br>      <td>Case Was Approved</td><br>      <td>On April 29, 2016, we approved your Form I-765…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>22</th><br>      <td>EAC1690120049</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>23</th><br>      <td>EAC1690120050</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 20, 2016, the Post Office delivered you…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>24</th><br>      <td>EAC1690120039</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>25</th><br>      <td>EAC1690120007</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>26</th><br>      <td>EAC1690120024</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>27</th><br>      <td>EAC1690120017</td><br>      <td>Case Was Received</td><br>      <td>On February 22, 2016, we received your Form I-…</td><br>      <td></td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>28</th><br>      <td>EAC1690120015</td><br>      <td>Case Was Transferred And A New Office Has Juri…</td><br>      <td>On March 9, 2016, we transferred your Form I-7…</td><br>      <td>processing</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>29</th><br>      <td>EAC1690120034</td><br>      <td>Card Was Delivered To Me By The Post Office</td><br>      <td>On May 20, 2016, the Post Office delivered you…</td><br>      <td>approved</td><br>      <td>2016-03-09</td><br>    </tr><br>    <tr><br>      <th>…</th><br>      <td>…</td><br>      <td>…</td><br>      <td>…</td><br>      <td>…</td><br>      <td>…</td><br>    </tr><br>    <tr><br>      <th>72565</th><br>      <td>YSC1690079974</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72566</th><br>      <td>YSC1690079984</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72567</th><br>      <td>YSC1690079954</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72568</th><br>      <td>YSC1690079977</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72569</th><br>      <td>YSC1690079997</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72570</th><br>      <td>YSC1690079965</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72571</th><br>      <td>YSC1690079978</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72572</th><br>      <td>YSC1690079995</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72573</th><br>      <td>YSC1690079987</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72574</th><br>      <td>YSC1690079975</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72575</th><br>      <td>YSC1690079996</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72576</th><br>      <td>YSC1690079970</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72577</th><br>      <td>YSC1690079979</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72578</th><br>      <td>YSC1690079994</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72579</th><br>      <td>YSC1690079992</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72580</th><br>      <td>YSC1690079985</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72581</th><br>      <td>YSC1690079989</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72582</th><br>      <td>YSC1690079908</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72583</th><br>      <td>YSC1690079971</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72584</th><br>      <td>YSC1690079990</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72585</th><br>      <td>YSC1690079999</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72586</th><br>      <td>YSC1690079988</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72587</th><br>      <td>YSC1690079958</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72588</th><br>      <td>YSC1690079956</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72589</th><br>      <td>YSC1690079955</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72590</th><br>      <td>YSC1690079981</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72591</th><br>      <td>YSC1690079969</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72592</th><br>      <td>YSC1690079986</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72593</th><br>      <td>YSC1690079966</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-130, I…</td><br>      <td></td><br>      <td>2016-05-09</td><br>    </tr><br>    <tr><br>      <th>72594</th><br>      <td>YSC1690079998</td><br>      <td>Case Was Received</td><br>      <td>On May 9, 2016, we received your Form I-765, A…</td><br>      <td>processing</td><br>      <td>2016-05-09</td><br>    </tr><br>  </tbody><br></table><br><p>129899 rows × 5 columns</p><br></div>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(data)</span><br></pre></td></tr></table></figure>
+<pre><code>             receipt                                              title  \
+0      EAC1690120011  Case Was Transferred And A New Office Has Juri...   
+1      EAC1690120006  Case Was Transferred And A New Office Has Juri...   
+2      EAC1690120001  Case Was Transferred And A New Office Has Juri...   
+3      EAC1690120003  Case Was Transferred And A New Office Has Juri...   
+4      EAC1690120002  Case Was Transferred And A New Office Has Juri...   
+5      EAC1690120009  Case Was Transferred And A New Office Has Juri...   
+6      EAC1690120012        Card Was Delivered To Me By The Post Office   
+7      EAC1690120010  Case Was Transferred And A New Office Has Juri...   
+8      EAC1690120000  Case Was Transferred And A New Office Has Juri...   
+9      EAC1690120004  Case Was Transferred And A New Office Has Juri...   
+10     EAC1690120019  Case Was Transferred And A New Office Has Juri...   
+11     EAC1690120029        Card Was Delivered To Me By The Post Office   
+12     EAC1690120018  Case Was Transferred And A New Office Has Juri...   
+13     EAC1690120022  Case Was Transferred And A New Office Has Juri...   
+14     EAC1690120014  Case Was Transferred And A New Office Has Juri...   
+15     EAC1690120021  Case Was Transferred And A New Office Has Juri...   
+16     EAC1690120028  Case Was Transferred And A New Office Has Juri...   
+17     EAC1690120038        Card Was Delivered To Me By The Post Office   
+18     EAC1690120032        Card Was Delivered To Me By The Post Office   
+19     EAC1690120013  Case Was Transferred And A New Office Has Juri...   
+20     EAC1690120008  Case Was Transferred And A New Office Has Juri...   
+21     EAC1690120027                                  Case Was Approved   
+22     EAC1690120049  Case Was Transferred And A New Office Has Juri...   
+23     EAC1690120050        Card Was Delivered To Me By The Post Office   
+24     EAC1690120039  Case Was Transferred And A New Office Has Juri...   
+25     EAC1690120007  Case Was Transferred And A New Office Has Juri...   
+26     EAC1690120024  Case Was Transferred And A New Office Has Juri...   
+27     EAC1690120017                                  Case Was Received   
+28     EAC1690120015  Case Was Transferred And A New Office Has Juri...   
+29     EAC1690120034        Card Was Delivered To Me By The Post Office   
+...              ...                                                ...   
+72565  YSC1690079974                                  Case Was Received   
+72566  YSC1690079984                                  Case Was Received   
+72567  YSC1690079954                                  Case Was Received   
+72568  YSC1690079977                                  Case Was Received   
+72569  YSC1690079997                                  Case Was Received   
+72570  YSC1690079965                                  Case Was Received   
+72571  YSC1690079978                                  Case Was Received   
+72572  YSC1690079995                                  Case Was Received   
+72573  YSC1690079987                                  Case Was Received   
+72574  YSC1690079975                                  Case Was Received   
+72575  YSC1690079996                                  Case Was Received   
+72576  YSC1690079970                                  Case Was Received   
+72577  YSC1690079979                                  Case Was Received   
+72578  YSC1690079994                                  Case Was Received   
+72579  YSC1690079992                                  Case Was Received   
+72580  YSC1690079985                                  Case Was Received   
+72581  YSC1690079989                                  Case Was Received   
+72582  YSC1690079908                                  Case Was Received   
+72583  YSC1690079971                                  Case Was Received   
+72584  YSC1690079990                                  Case Was Received   
+72585  YSC1690079999                                  Case Was Received   
+72586  YSC1690079988                                  Case Was Received   
+72587  YSC1690079958                                  Case Was Received   
+72588  YSC1690079956                                  Case Was Received   
+72589  YSC1690079955                                  Case Was Received   
+72590  YSC1690079981                                  Case Was Received   
+72591  YSC1690079969                                  Case Was Received   
+72592  YSC1690079986                                  Case Was Received   
+72593  YSC1690079966                                  Case Was Received   
+72594  YSC1690079998                                  Case Was Received   
 
+                                                    text      status  \
+0      On March 9, 2016, we transferred your Form I-7...  processing   
+1      On March 9, 2016, we transferred your Form I-7...  processing   
+2      On March 9, 2016, we transferred your Form I-7...  processing   
+3      On March 11, 2016, we transferred your Form I-...  processing   
+4      On March 9, 2016, we transferred your Form I-7...  processing   
+5      On March 9, 2016, we transferred your Form I-7...  processing   
+6      On May 13, 2016, the Post Office delivered you...    approved   
+7      On March 9, 2016, we transferred your Form I-7...  processing   
+8      On March 9, 2016, we transferred your Form I-7...  processing   
+9      On March 9, 2016, we transferred your Form I-7...  processing   
+10     On March 9, 2016, we transferred your Form I-7...  processing   
+11     On May 2, 2016, the Post Office delivered your...    approved   
+12     On March 9, 2016, we transferred your Form I-7...  processing   
+13     On March 9, 2016, we transferred your Form I-7...  processing   
+14     On March 9, 2016, we transferred your Form I-7...  processing   
+15     On March 9, 2016, we transferred your Form I-7...  processing   
+16     On March 9, 2016, we transferred your Form I-7...  processing   
+17     On April 16, 2016, the Post Office delivered y...    approved   
+18     On April 20, 2016, the Post Office delivered y...    approved   
+19     On March 9, 2016, we transferred your Form I-7...  processing   
+20     On March 9, 2016, we transferred your Form I-7...  processing   
+21     On April 29, 2016, we approved your Form I-765...    approved   
+22     On March 9, 2016, we transferred your Form I-7...  processing   
+23     On May 20, 2016, the Post Office delivered you...    approved   
+24     On March 9, 2016, we transferred your Form I-7...  processing   
+25     On March 9, 2016, we transferred your Form I-7...  processing   
+26     On March 9, 2016, we transferred your Form I-7...  processing   
+27     On February 22, 2016, we received your Form I-...               
+28     On March 9, 2016, we transferred your Form I-7...  processing   
+29     On May 20, 2016, the Post Office delivered you...    approved   
+...                                                  ...         ...   
+72565  On May 9, 2016, we received your Form I-765, A...  processing   
+72566  On May 9, 2016, we received your Form I-765, A...  processing   
+72567  On May 9, 2016, we received your Form I-765, A...  processing   
+72568  On May 9, 2016, we received your Form I-765, A...  processing   
+72569  On May 9, 2016, we received your Form I-765, A...  processing   
+72570  On May 9, 2016, we received your Form I-765, A...  processing   
+72571  On May 9, 2016, we received your Form I-765, A...  processing   
+72572  On May 9, 2016, we received your Form I-765, A...  processing   
+72573  On May 9, 2016, we received your Form I-765, A...  processing   
+72574  On May 9, 2016, we received your Form I-765, A...  processing   
+72575  On May 9, 2016, we received your Form I-765, A...  processing   
+72576  On May 9, 2016, we received your Form I-765, A...  processing   
+72577  On May 9, 2016, we received your Form I-765, A...  processing   
+72578  On May 9, 2016, we received your Form I-765, A...  processing   
+72579  On May 9, 2016, we received your Form I-765, A...  processing   
+72580  On May 9, 2016, we received your Form I-765, A...  processing   
+72581  On May 9, 2016, we received your Form I-765, A...  processing   
+72582  On May 9, 2016, we received your Form I-765, A...  processing   
+72583  On May 9, 2016, we received your Form I-765, A...  processing   
+72584  On May 9, 2016, we received your Form I-765, A...  processing   
+72585  On May 9, 2016, we received your Form I-765, A...  processing   
+72586  On May 9, 2016, we received your Form I-765, A...  processing   
+72587  On May 9, 2016, we received your Form I-765, A...  processing   
+72588  On May 9, 2016, we received your Form I-765, A...  processing   
+72589  On May 9, 2016, we received your Form I-765, A...  processing   
+72590  On May 9, 2016, we received your Form I-765, A...  processing   
+72591  On May 9, 2016, we received your Form I-765, A...  processing   
+72592  On May 9, 2016, we received your Form I-765, A...  processing   
+72593  On May 9, 2016, we received your Form I-130, I...               
+72594  On May 9, 2016, we received your Form I-765, A...  processing   
 
+            date  
+0     2016-03-09  
+1     2016-03-09  
+2     2016-03-09  
+3     2016-03-11  
+4     2016-03-09  
+5     2016-03-09  
+6     2016-03-09  
+7     2016-03-09  
+8     2016-03-09  
+9     2016-03-09  
+10    2016-03-09  
+11    2016-03-09  
+12    2016-03-09  
+13    2016-03-09  
+14    2016-03-09  
+15    2016-03-09  
+16    2016-03-09  
+17    2016-03-09  
+18    2016-03-09  
+19    2016-03-09  
+20    2016-03-09  
+21    2016-03-09  
+22    2016-03-09  
+23    2016-03-09  
+24    2016-03-09  
+25    2016-03-09  
+26    2016-03-09  
+27    2016-03-09  
+28    2016-03-09  
+29    2016-03-09  
+...          ...  
+72565 2016-05-09  
+72566 2016-05-09  
+72567 2016-05-09  
+72568 2016-05-09  
+72569 2016-05-09  
+72570 2016-05-09  
+72571 2016-05-09  
+72572 2016-05-09  
+72573 2016-05-09  
+72574 2016-05-09  
+72575 2016-05-09  
+72576 2016-05-09  
+72577 2016-05-09  
+72578 2016-05-09  
+72579 2016-05-09  
+72580 2016-05-09  
+72581 2016-05-09  
+72582 2016-05-09  
+72583 2016-05-09  
+72584 2016-05-09  
+72585 2016-05-09  
+72586 2016-05-09  
+72587 2016-05-09  
+72588 2016-05-09  
+72589 2016-05-09  
+72590 2016-05-09  
+72591 2016-05-09  
+72592 2016-05-09  
+72593 2016-05-09  
+72594 2016-05-09  
 
-<h1 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h1><p>Now I can look at the results. First, I group the data by the <code>date</code> column. Cases (rows) with the same date will be grouped together. Then, for each date, I count the number of <code>processing</code>, <code>approved</code>, and <code>rejected</code> cases.</p>
+[129899 rows x 5 columns]
+</code></pre><h1 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h1><p>Now I can look at the results. First, I group the data by the <code>date</code> column. Cases (rows) with the same date will be grouped together. Then, for each date, I count the number of <code>processing</code>, <code>approved</code>, and <code>rejected</code> cases.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">result = pandas.DataFrame(data[data[<span class="string">'status'</span>] == <span class="string">'processing'</span>].groupby(<span class="string">'date'</span>)[<span class="string">'receipt'</span>].count())</span><br><span class="line">result[<span class="string">'approved'</span>] = data[data[<span class="string">'status'</span>] == <span class="string">'approved'</span>].groupby(<span class="string">'date'</span>)[<span class="string">'receipt'</span>].count()</span><br><span class="line">result[<span class="string">'rejected'</span>] = data[data[<span class="string">'status'</span>] == <span class="string">'rejected'</span>].groupby(<span class="string">'date'</span>)[<span class="string">'receipt'</span>].count()</span><br><span class="line">result.columns = [<span class="string">'Processing'</span>, <span class="string">'Approved'</span>, <span class="string">'Rejected'</span>]</span><br></pre></td></tr></table></figure>
 <p>And I make a silly plot.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result.plot()</span><br></pre></td></tr></table></figure>
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x114b3a390&gt;
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x111202358&gt;
 </code></pre><p><img src="/images/OPT-I-765-Processing-Time/output_17_1.svg" alt="svg"></p>
 <p>Here’s how to interpret this data. I can see that most of the cases submitted in February and early March are already processed. The ones submitted in later March are around 50% processed. The ones submitted in late March (like mine) are beginning to get approved.</p>
 <p>For each date, I can see the number of cases approved, rejected, processing etc.</p>
@@ -130,7 +490,7 @@ Rejected         5.0
 Name: 2016-03-30 00:00:00, dtype: float64
 </code></pre><p>I can make this more readable by dividing the number of approved cases by the total number of processing, approved, and rejected cases.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">result[<span class="string">'Total'</span>] = result[<span class="string">'Processing'</span>] + result[<span class="string">'Approved'</span>] + result[<span class="string">'Rejected'</span>]</span><br><span class="line">result[<span class="string">'Approved Proportion'</span>] = result[<span class="string">'Approved'</span>] / result[<span class="string">'Total'</span>]</span><br><span class="line">result[<span class="string">'Approved Proportion'</span>].plot()</span><br></pre></td></tr></table></figure>
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x114ff3748&gt;
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11131ee10&gt;
 </code></pre><p><img src="/images/OPT-I-765-Processing-Time/output_21_1.svg" alt="svg"></p>
 <p>I really don’t understand why USCIS would not release this data (since it will help calm the nerves of so many international students). I do hope that this will help calm your nerves though as it did calm mine.</p>
 
