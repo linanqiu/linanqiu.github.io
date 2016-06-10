@@ -1,53 +1,79 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-
 <head>
-  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Oil Futures Curve Visualization | Pandamonium</title>
-  <meta name="description" content="Musings of a Panda" />
-  <meta name="HandheldFriendly" content="True" />
-  <meta name="MobileOptimized" content="320" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
-  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
-
-  <meta name="generator" content="Pandamonium">
-
+  <meta charset="utf-8">
   
+  <title>Oil Futures Curve Visualization | Pandamonium | Musings of a Panda</title>
+  <meta name="author" content="Linan Qiu">
+  
+  <meta name="description" content="Linan&#39;s Blog">
   
   
 
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Oil Futures Curve Visualization"/>
+  <meta property="og:site_name" content="Pandamonium"/>
+
   
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
 </head>
 
 
-<body class="post-template">
+<body>
+<div id="page" class="site">
+  <div id="primary" class="content-area">
 
-  <header class="site-head" >
-    <div class="vertical">
-        <div class="site-head-content inner">
-            
-            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
-            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
-        </div>
-    </div>
-</header>
+    <header id="header" class="inner"><div class="site-branding">
+  <h1 class="site-title">
+    <a href="/">Pandamonium</a>
+  </h1>
+  <p class="site-description">Musings of a Panda</p>
+</div>
+<nav id="site-navigation" class="main-navigation" role="navigation">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+</nav></header>
+
+    <article id="content" class="site-content">
+      <main id="main" class="site-main posts-loop" role="main">
+        <article class="post article">
+
+  
+  
+    <h3 class="article-title"><span>Oil Futures Curve Visualization</span></h3>
+  
+
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/01/09/Oil-Futures-Curve-Visualization/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-01-09T17:05:04.000Z">
+          2016-01-09
+        </time>
+      </a>
+    </span>
+  </div>
+
 
   
 
-<main class="content" role="main">
-  <article class="post">
-    <span class="post-meta">
-      <time datetime="2016-01-09T17:05:04.000Z" itemprop="datePublished">
-          2016-01-09
-      </time>
-    
-</span>
-    <h1 class="post-title">Oil Futures Curve Visualization</h1>
-    <section class="post-content">
-      <p>This oil thing is getting pretty crazy, especially with Saudi and Iran going bonkers over each other. Futures curves are a great way to speculate, and it’d be great to visualize the movement of the futures curve over different trading days.</p>
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>This oil thing is getting pretty crazy, especially with Saudi and Iran going bonkers over each other. Futures curves are a great way to speculate, and it’d be great to visualize the movement of the futures curve over different trading days.</p>
 <p>I thought this would be a pretty commonsensical thing for yahoo / google finance to provide, but turns out they provide nothing more than a single futures chain (settle prices for futures contracts right now). Historical prices aren’t available, and even if they are, they aren’t in the form of a futures curve. Instead, they are just prices for the specific contract (eg. the futures contract expiring on Feb 2016, not the front month contract and the contract expiring in one month etc). I want the relative numbers, not the absolute ones, hence this.</p>
 <p>I want a plot of the current futures prices for the next 12 months. Here’s how to do that simply</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">%matplotlib inline</span><br><span class="line"><span class="comment"># %config InlineBackend.figure_format = 'retina'</span></span><br><span class="line">%config InlineBackend.figure_format = <span class="string">'svg'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pandas_datareader.data <span class="keyword">as</span> data</span><br><span class="line"><span class="keyword">import</span> pandas_datareader.wb <span class="keyword">as</span> wb</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> matplotlib</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> pyplot</span><br><span class="line">matplotlib.style.use(<span class="string">'ggplot'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> Quandl</span><br><span class="line"></span><br><span class="line">API_KEY = <span class="string">'SUBSTITUTE_YOUR_OWN_API_KEY'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pyplot.rcParams['figure.figsize'] = (10, 10)</span></span><br></pre></td></tr></table></figure>
@@ -73,80 +99,76 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plot_year_curve_range(datetime.datetime(<span class="number">2016</span>, <span class="number">1</span>, <span class="number">8</span>), <span class="number">360</span>)</span><br><span class="line">pyplot.show()</span><br></pre></td></tr></table></figure>
 <p><img src="/images/Oil-Futures-Curve-Visualization/output_15_0.svg" alt="svg"></p>
 
-    </section>
-    <footer class="post-footer">
-      <section class="author">
-    <h4>Linan Qiu</h4>
-    <p>A panda that eats bamboo and bashes keyboards.</p>
-</section>
-      <section class="share">
-    <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2016/01/09/Oil-Futures-Curve-Visualization/"
-       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-        <span class="hidden">Twitter</span>
-    </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2016/01/09/Oil-Futures-Curve-Visualization/"
-       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-        <span class="hidden">Facebook</span>
-    </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2016/01/09/Oil-Futures-Curve-Visualization/"
-       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-        <span class="hidden">Google+</span>
-    </a>
-</section>
+      
+    </div>
+    <footer class="article-footer">
+        <div class="article-meta pull-left">
+          
+          
+        </div>
+        
     </footer>
-  </article>
-  <nav class="pagination" role="pagination">
-    
-    <a class="newer-posts" href="/2016/04/22/Running-Word-Embedding-on-Piazza-Posts/">
-        ← Running Word Embedding on Piazza Posts
-    </a>
-    
-    <span class="page-number">•</span>
-    
-    <a class="older-posts" href="/2016/01/04/Grades/">
-        Grades →
-    </a>
-    
-</nav>
-  <div id="comment" class="comments-area">
-    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
-
-    
-</div>
-</main>
-
-
-  
-<footer class="site-footer">
-  
-  <div class="inner">
-     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
-     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
+</article>
+
+  
+
+
+
+      </main>
+    </article>
+
+    <footer id="colophon" class="site-footer" role="contentinfo"><p class="site-info">
+  Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+  Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+  </br>
+  
+  &copy; 2016 Linan Qiu
+  
+</p>
 </footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    ga('create', 'UA-66827435-1', 'auto');
+    ga('send', 'pageview');
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
-
-
-<script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-66827435-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
 </script>
 
+  </div>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 </body>
 </html>

@@ -1,53 +1,79 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-
 <head>
-  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Sentiment Analysis Using Doc2Vec | Pandamonium</title>
-  <meta name="description" content="Musings of a Panda" />
-  <meta name="HandheldFriendly" content="True" />
-  <meta name="MobileOptimized" content="320" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
-  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
-
-  <meta name="generator" content="Pandamonium">
-
+  <meta charset="utf-8">
   
+  <title>Sentiment Analysis Using Doc2Vec | Pandamonium | Musings of a Panda</title>
+  <meta name="author" content="Linan Qiu">
+  
+  <meta name="description" content="Linan&#39;s Blog">
   
   
 
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Sentiment Analysis Using Doc2Vec"/>
+  <meta property="og:site_name" content="Pandamonium"/>
+
   
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
 </head>
 
 
-<body class="post-template">
+<body>
+<div id="page" class="site">
+  <div id="primary" class="content-area">
 
-  <header class="site-head" >
-    <div class="vertical">
-        <div class="site-head-content inner">
-            
-            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
-            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
-        </div>
-    </div>
-</header>
+    <header id="header" class="inner"><div class="site-branding">
+  <h1 class="site-title">
+    <a href="/">Pandamonium</a>
+  </h1>
+  <p class="site-description">Musings of a Panda</p>
+</div>
+<nav id="site-navigation" class="main-navigation" role="navigation">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+</nav></header>
+
+    <article id="content" class="site-content">
+      <main id="main" class="site-main posts-loop" role="main">
+        <article class="post article">
+
+  
+  
+    <h3 class="article-title"><span>Sentiment Analysis Using Doc2Vec</span></h3>
+  
+
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2015/10/07/word2vec-sentiment/" rel="bookmark">
+        <time class="entry-date published" datetime="2015-10-07T18:51:24.000Z">
+          2015-10-07
+        </time>
+      </a>
+    </span>
+  </div>
+
 
   
 
-<main class="content" role="main">
-  <article class="post">
-    <span class="post-meta">
-      <time datetime="2015-10-07T18:51:24.000Z" itemprop="datePublished">
-          2015-10-07
-      </time>
-    
-</span>
-    <h1 class="post-title">Sentiment Analysis Using Doc2Vec</h1>
-    <section class="post-content">
-      <h1 id="Sentiment-Analysis-using-Doc2Vec"><a href="#Sentiment-Analysis-using-Doc2Vec" class="headerlink" title="Sentiment Analysis using Doc2Vec"></a>Sentiment Analysis using Doc2Vec</h1><p>Word2Vec is dope. In short, it takes in a corpus, and churns out vectors for each of those words. What’s so special about these vectors you ask? Well, similar words are near each other. Furthermore, these vectors represent how we use the words. For example, <code>v_man - v_woman</code> is approximately equal to <code>v_king - v_queen</code>, illustrating the relationship that “man is to woman as king is to queen”. This process, in NLP voodoo, is called <strong>word embedding</strong>. These representations have been applied widely. This is made even more awesome with the introduction of Doc2Vec that represents not only words, but entire sentences and documents. Imagine being able to represent an entire sentence using a fixed-length vector and proceeding to run all your standard classification algorithms. Isn’t that amazing?</p>
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="Sentiment-Analysis-using-Doc2Vec"><a href="#Sentiment-Analysis-using-Doc2Vec" class="headerlink" title="Sentiment Analysis using Doc2Vec"></a>Sentiment Analysis using Doc2Vec</h1><p>Word2Vec is dope. In short, it takes in a corpus, and churns out vectors for each of those words. What’s so special about these vectors you ask? Well, similar words are near each other. Furthermore, these vectors represent how we use the words. For example, <code>v_man - v_woman</code> is approximately equal to <code>v_king - v_queen</code>, illustrating the relationship that “man is to woman as king is to queen”. This process, in NLP voodoo, is called <strong>word embedding</strong>. These representations have been applied widely. This is made even more awesome with the introduction of Doc2Vec that represents not only words, but entire sentences and documents. Imagine being able to represent an entire sentence using a fixed-length vector and proceeding to run all your standard classification algorithms. Isn’t that amazing?</p>
 <p>However, Word2Vec documentation is shit. The C-code is nigh unreadable (700 lines of highly optimized, and sometimes weirdly optimized code). I personally spent a lot of time untangling Doc2Vec and crashing into ~50% accuracies due to implementation mistakes. This tutorial aims to help other users get off the ground using Word2Vec for their own research. We use Word2Vec for <strong>sentiment analysis</strong> by attempting to classify the Cornell IMDB movie review corpus (<a href="http://www.cs.cornell.edu/people/pabo/movie-review-data/" target="_blank" rel="external">http://www.cs.cornell.edu/people/pabo/movie-review-data/</a>).</p>
 <p>The source code used in this demo can be found at <a href="https://github.com/linanqiu/word2vec-sentiments" target="_blank" rel="external">https://github.com/linanqiu/word2vec-sentiments</a></p>
 <h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><h3 id="Modules"><a href="#Modules" class="headerlink" title="Modules"></a>Modules</h3><p>We use <code>gensim</code>, since <code>gensim</code> has a much more readable implementation of Word2Vec (and Doc2Vec). Bless those guys. We also use <code>numpy</code> for general array manipulation, and <code>sklearn</code> for Logistic Regression classifier.</p>
@@ -166,80 +192,76 @@
 <li>Paper that inspired this: <a href="http://arxiv.org/abs/1405.4053" target="_blank" rel="external">http://arxiv.org/abs/1405.4053</a></li>
 </ul>
 
-    </section>
-    <footer class="post-footer">
-      <section class="author">
-    <h4>Linan Qiu</h4>
-    <p>A panda that eats bamboo and bashes keyboards.</p>
-</section>
-      <section class="share">
-    <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2015/10/07/word2vec-sentiment/"
-       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-        <span class="hidden">Twitter</span>
-    </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2015/10/07/word2vec-sentiment/"
-       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-        <span class="hidden">Facebook</span>
-    </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2015/10/07/word2vec-sentiment/"
-       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-        <span class="hidden">Google+</span>
-    </a>
-</section>
+      
+    </div>
+    <footer class="article-footer">
+        <div class="article-meta pull-left">
+          
+          
+        </div>
+        
     </footer>
-  </article>
-  <nav class="pagination" role="pagination">
-    
-    <a class="newer-posts" href="/2015/10/13/Python-on-EC2/">
-        ← Python on EC2
-    </a>
-    
-    <span class="page-number">•</span>
-    
-    <a class="older-posts" href="/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/">
-        Using CircleCI to Grade Java Assignments →
-    </a>
-    
-</nav>
-  <div id="comment" class="comments-area">
-    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
-
-    
-</div>
-</main>
-
-
-  
-<footer class="site-footer">
-  
-  <div class="inner">
-     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
-     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
+</article>
+
+  
+
+
+
+      </main>
+    </article>
+
+    <footer id="colophon" class="site-footer" role="contentinfo"><p class="site-info">
+  Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+  Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+  </br>
+  
+  &copy; 2016 Linan Qiu
+  
+</p>
 </footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    ga('create', 'UA-66827435-1', 'auto');
+    ga('send', 'pageview');
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
-
-
-<script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-66827435-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
 </script>
 
+  </div>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 </body>
 </html>

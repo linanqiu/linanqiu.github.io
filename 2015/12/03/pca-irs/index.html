@@ -1,53 +1,79 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-
 <head>
-  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Principal Component Analysis on Interest Rate Swaps | Pandamonium</title>
-  <meta name="description" content="Musings of a Panda" />
-  <meta name="HandheldFriendly" content="True" />
-  <meta name="MobileOptimized" content="320" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
-  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
-
-  <meta name="generator" content="Pandamonium">
-
+  <meta charset="utf-8">
   
+  <title>Principal Component Analysis on Interest Rate Swaps | Pandamonium | Musings of a Panda</title>
+  <meta name="author" content="Linan Qiu">
+  
+  <meta name="description" content="Linan&#39;s Blog">
   
   
 
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Principal Component Analysis on Interest Rate Swaps"/>
+  <meta property="og:site_name" content="Pandamonium"/>
+
   
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
 </head>
 
 
-<body class="post-template">
+<body>
+<div id="page" class="site">
+  <div id="primary" class="content-area">
 
-  <header class="site-head" >
-    <div class="vertical">
-        <div class="site-head-content inner">
-            
-            <h1 class="blog-title"><a href="/">Pandamonium</a></h1>
-            <h2 class="blog-description"><a href="/">Musings of a Panda</a></h2>
-        </div>
-    </div>
-</header>
+    <header id="header" class="inner"><div class="site-branding">
+  <h1 class="site-title">
+    <a href="/">Pandamonium</a>
+  </h1>
+  <p class="site-description">Musings of a Panda</p>
+</div>
+<nav id="site-navigation" class="main-navigation" role="navigation">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+</nav></header>
+
+    <article id="content" class="site-content">
+      <main id="main" class="site-main posts-loop" role="main">
+        <article class="post article">
+
+  
+  
+    <h3 class="article-title"><span>Principal Component Analysis on Interest Rate Swaps</span></h3>
+  
+
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2015/12/03/pca-irs/" rel="bookmark">
+        <time class="entry-date published" datetime="2015-12-03T06:40:39.000Z">
+          2015-12-03
+        </time>
+      </a>
+    </span>
+  </div>
+
 
   
 
-<main class="content" role="main">
-  <article class="post">
-    <span class="post-meta">
-      <time datetime="2015-12-03T06:40:39.000Z" itemprop="datePublished">
-          2015-12-03
-      </time>
-    
-</span>
-    <h1 class="post-title">Principal Component Analysis on Interest Rate Swaps</h1>
-    <section class="post-content">
-      <blockquote>
+  <div class="article-content">
+    <div class="entry">
+      
+        <blockquote>
 <p>In partial satisfaction of the project requirement for the class Statistical Methods in Finance <code>STAT W4290</code> Fall 2015.</p>
 </blockquote>
 <h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>This project applies Principal Component Analysis (PCA) to interest rate swaps and shows that the first 3 principal components correspond to yields, slope, and curvature respectively. I first start with vanilla interest rate swaps, and explain how an analysis based purely on single trades are unsatisfactory. I then shift our analysis to curve trades done using pairs of interest rate swaps and show how that is more useful in modeling different parts of the yield curve. I then demonstrate how the principal components from the analysis corresponding to yield, slope and curvature.</p>
@@ -245,80 +271,76 @@ Cumulative Proportion  9.999163e-01 1.000000e+00      1
 <figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">butterfly2_10_30 = (DSWP10 - DSWP5) - (DSWP30 - DSWP10)</span><br><span class="line">third_factor_butterfly = data.frame(rownames(scores), scores_dataframe$pc3, last(butterfly2_10_30, <span class="number">250</span>))</span><br><span class="line">colnames(third_factor_butterfly) = c(<span class="string">'date'</span>, <span class="string">'pc3'</span>, <span class="string">'butterfly2y10y30y'</span>)</span><br><span class="line">third_factor_butterfly$pc3 = -third_factor_butterfly$pc3</span><br><span class="line"></span><br><span class="line">p1 = ggplot() + geom_line(data=third_factor_butterfly, aes(x=as.Date(date), y=pc3), colour=gg_color_hue(<span class="number">1</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'left/red: PC3, right/blue: 2s10s30s Yield'</span>)</span><br><span class="line">p2 = ggplot() + geom_line(data=third_factor_butterfly, aes(x=as.Date(date), y=butterfly2y10y30y), colour=gg_color_hue(<span class="number">2</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme(panel.background = element_rect(fill = <span class="literal">NA</span>))</span><br><span class="line">g = stack_plot(p1, p2)</span><br><span class="line">grid.draw(g)</span><br></pre></td></tr></table></figure>
 <p><img src="/images/pca-irs/output_50_0.svg" alt="svg"></p>
 
-    </section>
-    <footer class="post-footer">
-      <section class="author">
-    <h4>Linan Qiu</h4>
-    <p>A panda that eats bamboo and bashes keyboards.</p>
-</section>
-      <section class="share">
-    <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=http://linanqiu.github.io/2015/12/03/pca-irs/"
-       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-        <span class="hidden">Twitter</span>
-    </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://linanqiu.github.io/2015/12/03/pca-irs/"
-       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-        <span class="hidden">Facebook</span>
-    </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://linanqiu.github.io/2015/12/03/pca-irs/"
-       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-        <span class="hidden">Google+</span>
-    </a>
-</section>
+      
+    </div>
+    <footer class="article-footer">
+        <div class="article-meta pull-left">
+          
+          
+        </div>
+        
     </footer>
-  </article>
-  <nav class="pagination" role="pagination">
-    
-    <a class="newer-posts" href="/2015/12/10/Memoization-Recursion-Dynamic-Programming/">
-        ← Memoization Recursion Dynamic Programming
-    </a>
-    
-    <span class="page-number">•</span>
-    
-    <a class="older-posts" href="/2015/10/26/Binomial-European-Option-Pricing-in-R/">
-        Binomial European Option Pricing in R →
-    </a>
-    
-</nav>
-  <div id="comment" class="comments-area">
-    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
-
-    
-</div>
-</main>
-
-
-  
-<footer class="site-footer">
-  
-  <div class="inner">
-     <section class="copyright">All content copyright <a href="/">Pandamonium</a> &copy; 2016 &bull; All rights reserved.</section>
-     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
+</article>
+
+  
+
+
+
+      </main>
+    </article>
+
+    <footer id="colophon" class="site-footer" role="contentinfo"><p class="site-info">
+  Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+  Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+  </br>
+  
+  &copy; 2016 Linan Qiu
+  
+</p>
 </footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    ga('create', 'UA-66827435-1', 'auto');
+    ga('send', 'pageview');
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
-
-
-<script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-66827435-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
 </script>
 
+  </div>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 </body>
 </html>
