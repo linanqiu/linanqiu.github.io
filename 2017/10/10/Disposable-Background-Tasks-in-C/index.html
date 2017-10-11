@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Disposable Background Tasks in C# | Pandamonium | Musings of a Panda</title>
+  <meta name="author" content="Linan Qiu">
+  
+  <meta name="description" content="Linan&#39;s Blog">
+  
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Disposable Background Tasks in C#"/>
+  <meta property="og:site_name" content="Pandamonium"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+</head>
+
+
+<body>
+<div id="page" class="site">
+  <div id="primary" class="content-area">
+
+    <header id="header" class="inner"><div class="site-branding">
+  <h1 class="site-title">
+    <a href="/">Pandamonium</a>
+  </h1>
+  <p class="site-description">Musings of a Panda</p>
+</div>
+<nav id="site-navigation" class="main-navigation" role="navigation">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+</nav></header>
+
+    <article id="content" class="site-content">
+      <main id="main" class="site-main posts-loop" role="main">
+        <article class="post article">
+
+  
+  
+    <h3 class="article-title"><span>Disposable Background Tasks in C#</span></h3>
+  
+
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2017/10/10/Disposable-Background-Tasks-in-C/" rel="bookmark">
+        <time class="entry-date published" datetime="2017-10-11T02:18:33.000Z">
+          2017-10-10
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>I wanted a clean way to spin up a looping task in C# and do things while the task is running.</p>
+<p>Conceptually, I want</p>
+<ol style="list-style-type: decimal">
+<li>Start the “service”</li>
+<li>Run procedure</li>
+<li>Stop the “service”</li>
+</ol>
+<p>This would be simple if the “service” had a start / stop button. However, the “service” runs like <strong>dead man’s switch</strong>: unless it’s pinged every now and then, it dies. When it’s first pinged, it starts up. Specifically, what I had was:</p>
+<ul>
+<li>A “service” that dies if I don’t ping it every 10 seconds</li>
+<li>A procedure that need to be run against the “service” while it’s alive</li>
+</ul>
+<p>I needed a clean way to write my routine without resorting to <code>Thread.Sleep</code> and <code>for</code> loop hell. The obvious answer’s threading – put the timer and ping on a background thread, run the procedure, then kill the thread. This is probably simple using the <a href="https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/task-parallel-library-tpl" target="_blank" rel="external">Task Parallel Library</a> in C#. However, I did not want to do so imperatively and start / stop the thread explicitly; doing so results in uglier / less readable code.</p>
+<p>Turns out <code>IDisposable</code> gives me a clean way to do this:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System;</div><div class="line"><span class="keyword">using</span> System.Threading;</div><div class="line"><span class="keyword">using</span> System.Threading.Tasks;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> <span class="title">DisposableThread</span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">internal</span> <span class="keyword">class</span> <span class="title">Program</span></div><div class="line">    &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></div><div class="line"><span class="function">        </span>&#123;</div><div class="line">            <span class="keyword">using</span> (<span class="keyword">new</span> DisposableThread(() =&gt; Console.WriteLine(<span class="string">"DisposableThread running"</span>), <span class="number">100</span>))</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)</div><div class="line">                &#123;</div><div class="line">                    Console.WriteLine(<span class="string">"Main running"</span>);</div><div class="line">                    Thread.Sleep(<span class="number">350</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DisposableThread</span> : <span class="title">IDisposable</span></div><div class="line">    &#123;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">readonly</span> CancellationTokenSource _cancellationTokenSource;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">readonly</span> Task _task;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DisposableThread</span>(<span class="params">Action action, <span class="keyword">int</span> delayMilliseconds</span>)</span></div><div class="line"><span class="function">        </span>&#123;</div><div class="line">            Console.WriteLine(<span class="string">"DisposableThread started"</span>);</div><div class="line"></div><div class="line">            _cancellationTokenSource = <span class="keyword">new</span> CancellationTokenSource();</div><div class="line">            <span class="keyword">var</span> token = _cancellationTokenSource.Token;</div><div class="line"></div><div class="line">            _task = Task.Run(<span class="keyword">async</span> () =&gt;</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">while</span> (!token.IsCancellationRequested)</div><div class="line">                &#123;</div><div class="line">                    action();</div><div class="line">                    <span class="keyword">await</span> Task.Delay(delayMilliseconds, token);</div><div class="line">                &#125;</div><div class="line">            &#125;, token);</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"></span>)</span></div><div class="line"><span class="function">        </span>&#123;</div><div class="line">            _cancellationTokenSource.Cancel();</div><div class="line">            <span class="keyword">try</span></div><div class="line">            &#123;</div><div class="line">                _task.Wait();</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">catch</span> (AggregateException)</div><div class="line">            &#123;</div><div class="line">                Console.WriteLine(<span class="string">"DisposableThread task canceled"</span>);</div><div class="line">            &#125;</div><div class="line">            Console.WriteLine(<span class="string">"DisposableThread disposed"</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>This produces the output:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">DisposableThread started</div><div class="line">Main running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">Main running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">Main running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">Main running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread running</div><div class="line">DisposableThread task canceled</div><div class="line">DisposableThread disposed</div></pre></td></tr></table></figure>
+<p>Essentially, I wrapped the action I needed to do (in this case, a simple print to console <code>() =&gt; Console.WriteLine(&quot;DisposableThread running&quot;</code>) in a task:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span> () =&gt;</div><div class="line">&#123;</div><div class="line">    <span class="keyword">while</span> (!token.IsCancellationRequested)</div><div class="line">    &#123;</div><div class="line">        action();</div><div class="line">        <span class="keyword">await</span> Task.Delay(delayMilliseconds, token);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>If you extract this lambda into its own method, it would return a <code>Task</code> encapsulating encapsulating the multiple possible <code>await</code>s. The lambda holds on to the cancellation token <code>token</code> that allows us to act on cancellation requests (which can then be issued by the <code>Dispose()</code> method of <code>IDisposable</code>).</p>
+<p>Additionally, it’s important that we use <code>Task.Delay(delayMilliseconds, token)</code> instead of <code>Thread.Sleep(delayMilliseconds)</code>. This allows us to react to cancellations during the delay instead of after the delay.</p>
+<p>Finally, the dispose method needs to call <code>Task</code>’s <code>Wait()</code>:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    _cancellationTokenSource.Cancel();</div><div class="line">    <span class="keyword">try</span></div><div class="line">    &#123;</div><div class="line">        _task.Wait();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (AggregateException)</div><div class="line">    &#123;</div><div class="line">        Console.WriteLine(<span class="string">"DisposableThread task canceled"</span>);</div><div class="line">    &#125;</div><div class="line">    Console.WriteLine(<span class="string">"DisposableThread disposed"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>When we call <code>_cancellationTokenSource.Cancel()</code>, we are cancelling the task(s) that hold on to the token. Each of the tasks then throws a <code>TaskCanceledException</code>. This exception is not thrown in the main thread until it’s either handled explicitly or the garbage collector collects and finalizes the object. That means if the <code>TaskCanceledException</code> isn’t handled explicitly and the main thread goes on long enough, we may encounter an exception out of nowhere. Hence, we force the exception (which, like all <code>Task</code> exceptions, gets rolled into an <code>AggregateException</code>) by calling <code>_task.Wait()</code> and catch the exception explicitly.</p>
+<p>This allows me to write better looking code like this:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> (SessionFactory.PingedSession())</div><div class="line">&#123;</div><div class="line">    <span class="comment">// interact with session</span></div><div class="line">    <span class="comment">// interact more with session</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>without worrying about starting and stopping the background pinging thread.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+        <div class="article-meta pull-left">
+          
+          
+        </div>
+        
+    </footer>
+  </div>
+</article>
+
+  
+
+
+
+      </main>
+    </article>
+
+    <footer id="colophon" class="site-footer" role="contentinfo"><p class="site-info">
+  Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+  Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+  </br>
+  
+  &copy; 2017 Linan Qiu
+  
+</p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-66827435-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+</body>
+</html>
