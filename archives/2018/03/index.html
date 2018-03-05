@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Python on EC2 | Pandamonium | Musings of a Panda</title>
+  <title>Archives: 2018/3 | Pandamonium | Musings of a Panda</title>
   <meta name="author" content="Linan Qiu">
   
   <meta name="description" content="Linan&#39;s Blog">
@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-  <meta property="og:title" content="Python on EC2"/>
+  
   <meta property="og:site_name" content="Pandamonium"/>
 
   
@@ -49,49 +49,35 @@
 
     <article id="content" class="site-content">
       <main id="main" class="site-main posts-loop" role="main">
-        <article class="post article">
-
-  
-  
-    <h3 class="article-title"><span>Python on EC2</span></h3>
-  
-
-
-  <div class="article-top-meta">
-    <span class="posted-on">
-      <a href="/2015/10/13/Python-on-EC2/" rel="bookmark">
-        <time class="entry-date published" datetime="2015-10-13T05:12:39.000Z">
-          2015-10-13
-        </time>
-      </a>
-    </span>
-  </div>
-
-
-  
-
-  <div class="article-content">
-    <div class="entry">
-      
-        <p>Running Python on EC2 is a pain, and installing packages can be more of a pain (version clashes, permissions etc). Turns out the easiest way was just to use <code>virtualenv</code>. Here’s a helper script I created:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">sudo yum -y install gcc-c++ python27-devel atlas-sse3-devel lapack-devel</div><div class="line">curl -O from https://bootstrap.pypa.io/get-pip.py</div><div class="line">sudo python get-pip.py</div><div class="line">pip install virtualenv</div><div class="line"></div><div class="line"><span class="built_in">cd</span> ~/</div><div class="line">mkdir ./.virtualenv</div><div class="line"><span class="built_in">cd</span> ./.virtualenv</div><div class="line">virtualenv default</div><div class="line"><span class="built_in">source</span> ~/.virtualenv/default/bin/activate</div><div class="line"></div><div class="line"><span class="built_in">echo</span> <span class="string">"source ~/.virtualenv/default/bin/activate"</span> &gt;&gt; ~/.bashrc</div><div class="line"></div><div class="line"><span class="built_in">source</span> ~/.bashrc</div><div class="line"></div><div class="line">pip install --upgrade pip</div><div class="line">pip install numpy</div><div class="line">pip install scipy</div><div class="line"><span class="comment"># pip install gensim</span></div></pre></td></tr></table></figure>
-<p>This would get your <code>virtualenv</code> setup, and the default environment would be used every time you log in. It also upgrades <code>pip</code>, installs <code>numpy</code> and <code>scipy</code> as a demonstration.</p>
-
-      
-    </div>
-    <footer class="article-footer">
-        <div class="article-meta pull-left">
-          
-          
-        </div>
         
-    </footer>
-  </div>
-</article>
 
+<div class="article">
+
+<h2 class="article-title ">2018/3</h2>
+
+
+  <div class="archive">
+    
+      <article class="post archive">
+        <div class="archive-post">
+          <header>
+            <time datetime="2018-03-05T10:10:00.000Z">
+              <a href="/2018/03/05/Wedding-Seat-Optimization/">2018-03-05</a>
+            </time>
+            
+              <h3 class="archive-title"><a href="/2018/03/05/Wedding-Seat-Optimization/"><span>Wedding Seat Optimization</span></a></h3>
+            
+          </header>
+        </div>
+      </article>
+    
+    <nav class="pagination">
   
+  
+</nav>
+  </div>
 
-
+</div>
 
       </main>
     </article>

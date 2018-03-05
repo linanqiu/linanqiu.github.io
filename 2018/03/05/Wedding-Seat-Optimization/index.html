@@ -1,0 +1,310 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Wedding Seat Optimization | Pandamonium | Musings of a Panda</title>
+  <meta name="author" content="Linan Qiu">
+  
+  <meta name="description" content="Linan&#39;s Blog">
+  
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Wedding Seat Optimization"/>
+  <meta property="og:site_name" content="Pandamonium"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+</head>
+
+
+<body>
+<div id="page" class="site">
+  <div id="primary" class="content-area">
+
+    <header id="header" class="inner"><div class="site-branding">
+  <h1 class="site-title">
+    <a href="/">Pandamonium</a>
+  </h1>
+  <p class="site-description">Musings of a Panda</p>
+</div>
+<nav id="site-navigation" class="main-navigation" role="navigation">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+</nav></header>
+
+    <article id="content" class="site-content">
+      <main id="main" class="site-main posts-loop" role="main">
+        <article class="post article">
+
+  
+  
+    <h3 class="article-title"><span>Wedding Seat Optimization</span></h3>
+  
+
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2018/03/05/Wedding-Seat-Optimization/" rel="bookmark">
+        <time class="entry-date published" datetime="2018-03-05T10:10:00.000Z">
+          2018-03-05
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="wedding-seat-optimization-using-simulated-annealing">Wedding Seat Optimization using Simulated Annealing</h1>
+<p><em>Or what I do when I go back to Singapore for one friend’s wedding (congratulations Crystalbel and Kenneth!) and find that all but three of my friends are married / engaged.</em></p>
+<p>Turns out they all have a similar problem: wedding dinner planning. In particular, seat planning is a nightmare. It doesn’t take much imagination for one to picture one’s favorite relative specifying seating arrangements to the most minute detail. (“eh my sister’s uncle’s brother cannot sit with my brother’s cousin because they don’t see each other eye to eye.”) You probably don’t want to seat ex-es together as well. Same goes for ex-colleagues who may be awkward with each other. Whatever the reason is, seating arrangement is tricky.</p>
+<p>Thankfully, I’m not the first person to come across this problem. There’s a <a href="https://www.improbable.com/news/2012/Optimal-seating-chart.pdf" target="_blank" rel="external">very nice paper here by Bellows and Peterson</a> on this exact problem. This paper provided a neat framework to think about this problem, but aimed for the global optimal via mixed-integer linear optimization. I find that probably too overkill, and an approximate method that sufficient avoids the local minima trap should suffice. The paper also uses a proprietary solver which is a huge turn-off, and no one wants that for a wedding. Heh. Finally, I also wanted to learn some simulated annealing. So here’s a very short script that accomplishes that.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line">plt.style.use(<span class="string">'ggplot'</span>)</div><div class="line">%matplotlib inline</div><div class="line">%config InlineBackend.figure_format = <span class="string">'svg'</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> networkx <span class="keyword">as</span> nx</div><div class="line"><span class="keyword">import</span> string</div><div class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</div></pre></td></tr></table></figure>
+<h2 id="framing-this-as-a-combinatorial-optimization-problem">Framing This as a Combinatorial Optimization Problem</h2>
+<p>Going back to the problem statement, we can think about this as an combinatorial optimization problem. Essentially, seating preferences can be expressed as a series of weights between two parties. For example, if Linan hates sitting with Spongebob, I can assign the event that they sit together a <strong>positive cost</strong> of 50. If Gabriel and Kristie are a couple, and they would very much want to sit together, then them sitting together would incur a <strong>negative cost</strong> of -50. If Spongebob don’t want to sit with Squidward but won’t die if they do end up sit together, I can assign them a slightly lower positive cost (e.g. 20).</p>
+<p>Then, my overall goal is to minimize the cost of an arrangement. For example, if I had an arrangement that made Gabriel sit together with Kristie, Linan sit with Spongebob, and Spongebob sit with Squidward, the overall cost would be <code>-50 + 50 + 20 = 20</code>. However, if I moved Spongebob to a different table such that Gabriel, Kristie, Linan, and Squiward are at the same table, the cost for the arrangement becomes <code>-50</code> and that would be a way more preferable arrangement compared to the original. We assume of course that unspecified pairs (e.g. Gabriel and Squidward, Kristie and Linan) have a cost of 0 i.e. they don’t care if they do sit together or not.</p>
+<p>You can think of this as a graph problem with nodes being the dinner participants and edges being the costs.</p>
+<p>So let’s set up the problem. Assume that we have 10 guests initially and they hate / love each other in the following manner. Assume that each table seats 5 people, so we have two tables. Admire how creative the guest names are and how I have to import a whole damn package for that.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">guest_list = list(string.ascii_uppercase)[:<span class="number">10</span>]</div><div class="line"></div><div class="line"><span class="comment"># negative is good (those two like each other), positive is bad (those two hate each other)</span></div><div class="line">relationships_edges = &#123;</div><div class="line">    (<span class="string">'A'</span>, <span class="string">'B'</span>): <span class="number">-50</span>,</div><div class="line">    (<span class="string">'C'</span>, <span class="string">'D'</span>): <span class="number">-50</span>,</div><div class="line">    (<span class="string">'A'</span>, <span class="string">'D'</span>): <span class="number">50</span>,</div><div class="line">    (<span class="string">'E'</span>, <span class="string">'F'</span>): <span class="number">25</span>,</div><div class="line">    (<span class="string">'F'</span>, <span class="string">'G'</span>): <span class="number">-50</span>,</div><div class="line">    (<span class="string">'H'</span>, <span class="string">'I'</span>): <span class="number">-50</span>,</div><div class="line">&#125;</div><div class="line">table_size = <span class="number">5</span></div><div class="line">table_count = len(guest_list) // table_size</div><div class="line"></div><div class="line">print(guest_list)</div></pre></td></tr></table></figure>
+<pre><code>[&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;, &#39;H&#39;, &#39;I&#39;, &#39;J&#39;]</code></pre>
+<p>Given <code>relationships_edges</code>, I want to convert them into a diagonal cost matrix so that matrix operations become easier (and faster! thanks <code>numpy</code>). To do this, I use the <code>networkx</code>.</p>
+<p>I also normalize the costs by a factor of <code>100</code> so that it plays nice with the cost and acceptance probability later.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">temp_graph = nx.Graph()</div><div class="line"><span class="keyword">for</span> k, v <span class="keyword">in</span> relationships_edges.items():</div><div class="line">    temp_graph.add_edge(k[<span class="number">0</span>], k[<span class="number">1</span>], weight=v)</div><div class="line">relationships_mat_unnormed = nx.to_numpy_matrix(temp_graph.to_undirected(), nodelist=guest_list)</div><div class="line"></div><div class="line">relationships_mat = relationships_mat_unnormed / <span class="number">100</span></div><div class="line"></div><div class="line">print(relationships_mat)</div></pre></td></tr></table></figure>
+<pre><code>[[ 0.   -0.5   0.    0.5   0.    0.    0.    0.    0.    0.  ]
+ [-0.5   0.    0.    0.    0.    0.    0.    0.    0.    0.  ]
+ [ 0.    0.    0.   -0.5   0.    0.    0.    0.    0.    0.  ]
+ [ 0.5   0.   -0.5   0.    0.    0.    0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.    0.    0.25  0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.    0.25  0.   -0.5   0.    0.    0.  ]
+ [ 0.    0.    0.    0.    0.   -0.5   0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.    0.    0.    0.    0.   -0.5   0.  ]
+ [ 0.    0.    0.    0.    0.    0.    0.   -0.5   0.    0.  ]
+ [ 0.    0.    0.    0.    0.    0.    0.    0.    0.    0.  ]]</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">relationships_mat[<span class="number">0</span>, <span class="number">1</span>]</div></pre></td></tr></table></figure>
+<pre><code>-0.5</code></pre>
+<p>Now we have a diagonal matrix of costs. An element at <code>relationships_mat[i, j]</code> describes the cost of putting guest <code>i</code> and guest <code>j</code> together in the same table. For example, <code>guest_list[0] = 'A'</code> and <code>guest_list[1] = 'B'</code>. The cost of putting <code>A</code> and <code>B</code> together at the same table is <code>-50</code> (i.e. they love each other! yay!). <code>relationships_mat[0, 1]</code> gives us the normalized cost of <code>-50 / 100 = -0.5</code> as expected.</p>
+<p>Notice how <code>networkx</code> converted a <code>nodelist</code> of <code>guest_list</code> into positional integers for me. Isn’t that neat?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">table_0_seats = np.matrix([[<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]])</div><div class="line">print(table_0_seats)</div></pre></td></tr></table></figure>
+<pre><code>[[1 0 1 0 0 1 1 1 0 0]]</code></pre>
+<p>We can express a single “table” as a row in a matrix by marking guests present at the table with a <code>1</code> and those not present as <code>0</code> for the positional integer that represents them. For example, a table that contains <code>'A', 'C', 'F', 'G', 'H'</code> can be expressed using the <code>table_0_seats</code> above.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">table_0_seats = np.matrix([[<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]])</div><div class="line">print(table_0_seats * relationships_mat * table_0_seats.T)</div></pre></td></tr></table></figure>
+<pre><code>[[-1.]]</code></pre>
+<p>We then observe the interesting (okay probably not interesting) property that <span class="math inline">\(SRS^T\)</span> where <span class="math inline">\(S\)</span> is the seats matrix, <span class="math inline">\(R\)</span> is the relationships cost matrix <code>relationships_mat</code> and <span class="math inline">\(S^T\)</span> is the transpose of the seats matrix gives us the cost of a particular arrangement (or more precisely, the total cost incurred per person. e.g. since <code>F</code> and <code>G</code> are sitting at the same table, the cost incurred by each of them is <code>-0.5</code>, so the total cost for the table is <code>-1</code>).</p>
+<p>Using <code>table_0_seats</code> as an example, the result of doing the quadratic multiplication is:</p>
+<p><span class="math display">\[SRS^T = \sum^{guests}_{i=0} \sum^{guests}_{j=0} S_{1,i} \times R_{i,j} \times S^T_{j,1} \]</span></p>
+<p>Now this is just the formulation for a single table. We can easily imagine each row of <span class="math inline">\(S\)</span> as a single table. In that case, we get:</p>
+<p><span class="math display">\[SRS^T = C\]</span></p>
+<p><span class="math display">\[C_{k, l} = \sum^{guests}_{i=0} \sum^{guests}_{j=0} \sum^{tables}_{k=0} \sum^{tables}_{l=0} S_{k,i} \times R_{i,j} \times S^T_{j,l} \]</span></p>
+<p>This is what we do below:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">table_seats_a = np.matrix([</div><div class="line">    [<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>],</div><div class="line">    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>]</div><div class="line">])</div><div class="line">table_costs_a = table_seats_a * relationships_mat * table_seats_a.T</div><div class="line">print(table_costs_a)</div><div class="line">print(np.trace(table_costs_a))</div></pre></td></tr></table></figure>
+<pre><code>[[-1.   -0.75]
+ [-0.75  0.  ]]
+-1.0</code></pre>
+<p>Then, the diagonal of <span class="math inline">\(C\)</span> should give the cost of tables where <span class="math inline">\(k=l\)</span> i.e. our actual costs. The sum of the diagonal (or the <em>trace</em>) gives us the total cost of a given arrangement.</p>
+<p><span class="math display">\[Cost = \sum^{tables}_{m} C_{m,m}\]</span></p>
+<p>Using the example above, <code>table_seats_a</code> puts <code>'A', 'C', 'F', 'G', 'H'</code> in one table and <code>'B', 'D', 'E', 'I', 'J'</code> in another. <code>F</code> loves <code>G</code>, so each incurs a normalized negative cost of <code>-0.5</code>. So <code>np.trace(table_costs_a)</code> gives us <code>-1</code>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">table_seats_b = np.matrix([</div><div class="line">    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>],</div><div class="line">    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>]</div><div class="line">])</div><div class="line">table_costs_b = table_seats_b * relationships_mat * table_seats_b.T</div><div class="line">print(table_costs_b)</div><div class="line">print(np.trace(table_costs_b))</div></pre></td></tr></table></figure>
+<pre><code>[[-1.    0.25]
+ [ 0.25 -2.  ]]
+-3.0</code></pre>
+<p>We can probably do better than that. So let’s try putting <code>'A', 'B', 'C', 'E', 'J'</code> in one table and <code>'D', 'F', 'G', 'H', 'I'</code> in the other. In this case, our first table gives us a cost of <code>-1</code> because of <code>A</code> and <code>B</code>. The second table gives us <code>-2</code> due to <code>F</code> <code>G</code> and <code>H</code> <code>I</code>. This leaves us with a total cost of <code>np.trace(table_costs_b) = -3</code>.</p>
+<p>The advantage of defining our cost calculation in terms of a matrix quadratic operation is that <strong><code>numpy</code> is fucking fast</strong> and tons of optimizations are built around those things. Plus it’s kind of elegant heh.</p>
+<h2 id="constraints-requirements-and-strategy">Constraints, Requirements, and Strategy</h2>
+<p>Now we just need to minimize <span class="math inline">\(C\)</span> subject to some constraints:</p>
+<ul>
+<li>The number of people in each table should not change.</li>
+<li>As a corollary (and if you defined the starting point correctly), the total number of guests with seats should not change and hence everyone should be seated (otherwise one solution where people only hate each other and there’s no love is to keep removing people).</li>
+<li>Avoiding local minima is very important for obvious reasons.</li>
+<li>Finding the absolute best answer is not that important. Having an approximate answer’s probably good enough.</li>
+</ul>
+<p>I chose <a href="https://www.wikiwand.com/en/Simulated_annealing" target="_blank" rel="external">simulated annealing</a> because I’ve been wanting to learn that for quite a while. (thanks Quan!) It also gives me a really simple way to solve a pretty intractable problem (wedding dinners often contain 200 or more guests) while satisfying all the requirements I have above – especially the one on local minimum.</p>
+<p>If you want a good introduction to simulated annealing, I suggest you read this: <a href="http://katrinaeg.com/simulated-annealing.html" class="uri" target="_blank" rel="external">http://katrinaeg.com/simulated-annealing.html</a>. It’s a really good tutorial, and she kicks ass at explaining simulated annealing. If you’re too lazy to read that, I stole the best part of the article that sums up simulated annealing nicely:</p>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>First, generate a random solution</li>
+<li>Calculate its cost using some cost function you’ve defined</li>
+<li>Generate a random neighboring solution</li>
+<li>Calculate the new solution’s cost</li>
+<li>Compare them:
+<ul>
+<li>If <code>c_new</code> &lt; <code>c_old</code>: move to the new solution</li>
+<li>If <code>c_new</code> &gt; <code>c_old</code>: maybe move to the new solution. <strong>Be more eager to move initially, and less eager to move later</strong></li>
+</ul></li>
+<li>Repeat steps 3-5 above until an acceptable solution is found or you reach some maximum number of iterations.</li>
+</ol>
+</blockquote>
+<p>Seriously though, go read the article. It’s awesomesauce.</p>
+<h2 id="simulated-annealing-functions">Simulated Annealing Functions</h2>
+<p>First we build our seat reshaping function:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">reshape_to_table_seats</span><span class="params">(x)</span>:</span></div><div class="line">    table_seats = x.reshape(table_count, len(guest_list))</div><div class="line">    <span class="keyword">return</span> table_seats</div></pre></td></tr></table></figure>
+<p><code>reshape</code> is a constant time operation that <code>numpy</code> provides that’s good for matrix heavy code. Helps you keep track of where you are and avoid cryptic bugs. I want my seat matrix <span class="math inline">\(S\)</span> to be of the shape <code>(table_count, guests)</code> so that the <span class="math inline">\(SRS^T\)</span> operation can be done easily.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">cost</span><span class="params">(x)</span>:</span></div><div class="line">    table_seats = reshape_to_table_seats(x)</div><div class="line">    table_costs = table_seats * relationships_mat * table_seats.T</div><div class="line">    table_cost = np.trace(table_costs)</div><div class="line">    <span class="keyword">return</span> table_cost</div></pre></td></tr></table></figure>
+<p>Then we define the cost function. This should be nothing new. It is basically the trace of the cost matrix as mentioned earlier. It calculates the cost for a given seating arrangement using the relationship cost matrix.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">take_step</span><span class="params">(x)</span>:</span></div><div class="line">    table_seats = reshape_to_table_seats(np.matrix(x, copy=<span class="keyword">True</span>))</div><div class="line">    <span class="comment"># randomly swap two guests</span></div><div class="line">    table_from, table_to = np.random.choice(table_count, <span class="number">2</span>, replace=<span class="keyword">False</span>)</div><div class="line">    </div><div class="line">    table_from_guests = np.where(table_seats[table_from] == <span class="number">1</span>)[<span class="number">1</span>]</div><div class="line">    table_to_guests = np.where(table_seats[table_to] == <span class="number">1</span>)[<span class="number">1</span>]</div><div class="line">    </div><div class="line">    table_from_guest = np.random.choice(table_from_guests)</div><div class="line">    table_to_guest = np.random.choice(table_to_guests)</div><div class="line">    </div><div class="line">    table_seats[table_from, table_from_guest] = <span class="number">0</span></div><div class="line">    table_seats[table_from, table_to_guest] = <span class="number">1</span></div><div class="line">    table_seats[table_to, table_to_guest] = <span class="number">0</span></div><div class="line">    table_seats[table_to, table_from_guest] = <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> table_seats</div></pre></td></tr></table></figure>
+<p>The <code>take_step</code> function does step 3: generate a random neighboring solution. It does so by picking two random tables and swapping two random guests from the two tables. This has the very nice property of:</p>
+<ul>
+<li>Being random (no seriously this is important. If you’re proceeding in a definite direction ala <a href="https://www.wikiwand.com/en/Gradient_descent" target="_blank" rel="external">gradient descent</a> you’ll find yourself in a local minimum pretty quickly. You’ll also limit your space exploration tremendously if you’re not random.</li>
+<li>Never changing the number of guests per table. This affords us tons of flexibility, including specifying tables with different number of guests (a common problem for odd ballrooms)</li>
+<li>Similarly, not seating the same guest at two tables / having empty table etc.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">prob_accept</span><span class="params">(cost_old, cost_new, temp)</span>:</span></div><div class="line">    a = <span class="number">1</span> <span class="keyword">if</span> cost_new &lt; cost_old <span class="keyword">else</span> np.exp((cost_old - cost_new) / temp)</div><div class="line">    <span class="keyword">return</span> a</div></pre></td></tr></table></figure>
+<p>Finally, <code>prob_accept</code> is the function that gives the probability of us moving from the current position to the neighboring position. If the neighboring position is indeed better (i.e. <code>cost_new &lt; cost_old</code>) we move (i.e. probabilty is 1). Otherwise, we “may” move using the function <code>np.exp((cost_old - cost_new) / temp)</code> where <code>temp</code> is a decreasing function of the number of iterations. This means that our probability for taking a worse neighboring position over the current position</p>
+<ul>
+<li>Decreases the shittier the new position is. (i.e. our neighboring position is already going to be worse than our current position because otherwise, we would have returned probability 1. Given that it is worse than our current position, we are more willing to move to a position that is less shitty than a position that is more shitty.) This is expressed in <code>cost_old - cost_new</code>. Since <code>cost_old &lt; cost_new</code>, <code>(cost_old - cost_new) &lt; 0</code>. The more negative <code>(cost_old - cost_new)</code> is, the lower <code>np.exp((cost_old - cost_new) / temp)</code> is and hence the lower the probability.</li>
+<li>Decreases as we do more iteration (i.e. we become more conservative as we run more iterations). This is expressed in the <code>temp</code> denominator. Since the numerator <code>(cost_old - cost_new)</code> is negative, having an increasingly smaller <code>temp</code> would make <code>(cost_old - cost_new) / temp</code> more negative, hence the probability lower.</li>
+</ul>
+<p>The four functions are reproduced below:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">reshape_to_table_seats</span><span class="params">(x)</span>:</span></div><div class="line">    table_seats = x.reshape(table_count, len(guest_list))</div><div class="line">    <span class="keyword">return</span> table_seats</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">cost</span><span class="params">(x)</span>:</span></div><div class="line">    table_seats = reshape_to_table_seats(x)</div><div class="line">    table_costs = table_seats * relationships_mat * table_seats.T</div><div class="line">    table_cost = np.trace(table_costs)</div><div class="line">    <span class="keyword">return</span> table_cost</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">take_step</span><span class="params">(x)</span>:</span></div><div class="line">    table_seats = reshape_to_table_seats(np.matrix(x, copy=<span class="keyword">True</span>))</div><div class="line">    <span class="comment"># randomly swap two guests</span></div><div class="line">    table_from, table_to = np.random.choice(table_count, <span class="number">2</span>, replace=<span class="keyword">False</span>)</div><div class="line">    </div><div class="line">    table_from_guests = np.where(table_seats[table_from] == <span class="number">1</span>)[<span class="number">1</span>]</div><div class="line">    table_to_guests = np.where(table_seats[table_to] == <span class="number">1</span>)[<span class="number">1</span>]</div><div class="line">    </div><div class="line">    table_from_guest = np.random.choice(table_from_guests)</div><div class="line">    table_to_guest = np.random.choice(table_to_guests)</div><div class="line">    </div><div class="line">    table_seats[table_from, table_from_guest] = <span class="number">0</span></div><div class="line">    table_seats[table_from, table_to_guest] = <span class="number">1</span></div><div class="line">    table_seats[table_to, table_to_guest] = <span class="number">0</span></div><div class="line">    table_seats[table_to, table_from_guest] = <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> table_seats</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">prob_accept</span><span class="params">(cost_old, cost_new, temp)</span>:</span></div><div class="line">    a = <span class="number">1</span> <span class="keyword">if</span> cost_new &lt; cost_old <span class="keyword">else</span> np.exp((cost_old - cost_new) / temp)</div><div class="line">    <span class="keyword">return</span> a</div></pre></td></tr></table></figure>
+<h2 id="annealing">Annealing</h2>
+<p>Now we get to the <code>anneal</code> function that runs the whole damn thing. We basically keep iterating until we reach a minimum temperature. The code should be pretty self explanatory and maps 1:1 to the pseudocode earlier. Essentially, it:</p>
+<ul>
+<li>Starts with an initial position</li>
+<li>While the current temperature is above the minimum temperature,
+<ul>
+<li>For <code>n_iter</code> steps,
+<ul>
+<li>Calculate a neighboring position (<code>pos_new</code>)</li>
+<li>Calculate the cost of the neighboring position (<code>cost_new</code>)</li>
+<li>Calculate the acceptance probability (<code>p_accept</code>) for the neighboring position</li>
+<li>“Maybe” move to the neighboring position</li>
+</ul></li>
+<li>Reduce current temperature by a given multiple (default value of <code>alpha=0.9</code>)</li>
+</ul></li>
+</ul>
+<p><code>audit_trail</code> lets me plot pretty graphs.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">anneal</span><span class="params">(pos_current, temp=<span class="number">1.0</span>, temp_min=<span class="number">0.00001</span>, alpha=<span class="number">0.9</span>, n_iter=<span class="number">100</span>, audit=False)</span>:</span></div><div class="line">    cost_old = cost(pos_current)</div><div class="line">    </div><div class="line">    audit_trail = []</div><div class="line">    </div><div class="line">    <span class="keyword">while</span> temp &gt; temp_min:</div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, n_iter):</div><div class="line">            pos_new = take_step(pos_current)</div><div class="line">            cost_new = cost(pos_new)</div><div class="line">            p_accept = prob_accept(cost_old, cost_new, temp)</div><div class="line">            <span class="keyword">if</span> p_accept &gt; np.random.random():</div><div class="line">                pos_current = pos_new</div><div class="line">                cost_old = cost_new</div><div class="line">            <span class="keyword">if</span> audit:</div><div class="line">                audit_trail.append((cost_new, cost_old, temp, p_accept))</div><div class="line">        temp *= alpha</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> pos_current, cost_old, audit_trail</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">result = anneal(table_seats_b, audit=<span class="keyword">True</span>)</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">print(result[<span class="number">0</span>])</div><div class="line">print(cost(result[<span class="number">0</span>]))</div></pre></td></tr></table></figure>
+<pre><code>[[0 0 1 1 1 0 0 1 1 0]
+ [1 1 0 0 0 1 1 0 0 1]]
+-4.0</code></pre>
+<p>And voila! We get our result. Turns out an optimal arrangement is to put <code>'C', 'D', 'E', 'H', 'I'</code> in one table and <code>'A', 'B', 'F', 'G', 'J'</code> in the other. The first table makes use of <code>C</code> <code>D</code> and <code>H</code> <code>I</code>. The second table makes use of <code>A</code> <code>B</code> and <code>F</code> <code>G</code>. That’s all the negative weights we have specified. Furthermore, it has avoided the positive weight combinations (<code>A</code> <code>D</code> and <code>E</code> <code>F</code>).</p>
+<p>To see the journey we took to get here, we can use the <code>audit_trail</code> data.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">audit_df = pd.DataFrame(result[<span class="number">2</span>], columns=[<span class="string">'cost_new'</span>, <span class="string">'cost_old'</span>, <span class="string">'temp'</span>, <span class="string">'p_accept'</span>])</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">audit_df[[<span class="string">'cost_old'</span>]].plot()</div><div class="line">audit_df[[<span class="string">'temp'</span>]].plot()</div><div class="line">audit_df[[<span class="string">'p_accept'</span>]].plot()</div></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x118a97748&gt;</code></pre>
+<div class="figure">
+<img src="/images/Wedding-Seat-Optimization/output_32_1.svg">
+
+</div>
+<div class="figure">
+<img src="/images/Wedding-Seat-Optimization/output_32_2.svg">
+
+</div>
+<div class="figure">
+<img src="/images/Wedding-Seat-Optimization/output_32_3.svg">
+
+</div>
+<p>We see that</p>
+<ul>
+<li><code>cost_old</code> decreases with random spikes initially due to us (adventurously!) exploring neighboring solutions.</li>
+<li><code>temp</code> decreases (duh)</li>
+<li><code>p_accept</code> decreases along with <code>temp</code> unless we find better solutions (in which case we set <code>p_accept</code> to 1)</li>
+</ul>
+<p>This is fucking awesome <code>:D</code></p>
+<h2 id="questions">Questions?</h2>
+<p><strong>Why are all your friends getting married?</strong></p>
+<p>Because they’re on a mission to repopulate Singapore and reduce our dependency on foreign talents like me. They’re also probably more charming than me.</p>
+<p><strong>When’s yours?</strong></p>
+<p>Fuck off.</p>
+<p><strong>I noticed you used <code>table_count = len(guest_list) // table_size</code>. That means all tables have to be of the same size right? What if I want different table sizes?</strong></p>
+<p>Ah! Yes. Great question. There’s actually no such assumption. You just need to have a constant number of tables. We take neighboring steps by swapping two guests in two random tables. That means we don’t actually change the number of guests in each other. So even if in our example (using 10 guests) we have one table with 1 guest and the other with 9 guests, this would still work.</p>
+<p>However, the number of tables would need to be constant. In other words, the table configuration (i.e. number of tables and number of people per table) need to be fixed. If you want to optimize over that, you’ll have to do multiple runs of this algorithm.</p>
+<p><strong>Why did you scale by <code>100</code> for the cost matrix and not use the cost matrix directly?</strong></p>
+<p>Because the way <code>p_accept</code> is defined (<code>np.exp((cost_old - cost_new) / temp)</code>) causes strange things to occur if <code>cost_old</code> is way too different from <code>cost_new</code>. You’d end up getting either 0 or 1 probabilities, which is not useful. Just observe the graph of <span class="math inline">\(f(x) = e^x\)</span> in the region of <span class="math inline">\(f(x) \leq 1\)</span>.</p>
+<p><strong>Are you going to make this into a website / command line app / app</strong></p>
+<p>Maybe. The fun’s all gone once the solution’s here though. I solved this three weeks ago and procrastinated writing this post for that long. Is this even worth making? I don’t know. Maybe more friends should get married.</p>
+<p><strong>Speaking of that, you should get married…</strong></p>
+<p>Fuck off.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+        <div class="article-meta pull-left">
+          
+          
+        </div>
+        
+    </footer>
+  </div>
+</article>
+
+  
+
+
+
+      </main>
+    </article>
+
+    <footer id="colophon" class="site-footer" role="contentinfo"><p class="site-info">
+  Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+  Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+  </br>
+  
+  &copy; 2018 Linan Qiu
+  
+</p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-66827435-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+</body>
+</html>
