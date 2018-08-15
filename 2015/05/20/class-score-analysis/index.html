@@ -76,37 +76,59 @@
         <p>After TA-ing COMS W3134 Data Structures for a semester, I was left with a sizable amount of data from the homeworks, exams, and piazza usage. So I decided to make some pretty graphs out of them. This stemmed from my frustration at previous classes – why only give students a mean and standard deviation if there are so many more dimensions to the data? And perhaps this may even inspire a student or two to like statistics (which unfortunately, given the way it is taught in Columbia, is hardly inspiring).</p>
 <p>So here’s some data porn.</p>
 <p>To make sense of it all, I’m going to invoke an imaginary student called George. George is that annoying student at the front of the class that questions the professor non-stop regarding the nitty gritty details of the course. Yes there’s always George.</p>
-<h2 id="Overall-Distributions"><a href="#Overall-Distributions" class="headerlink" title="Overall Distributions"></a>Overall Distributions</h2><p><em>George: What’s the mean and standard deviation for each homework, the midterm, and the final? Are they normal? You know I have this hypothesis that homeworks are bimodal…”</em></p>
+<h2 id="overall-distributions">Overall Distributions</h2>
+<p>*George: What’s the mean and standard deviation for each homework, the midterm, and the final? Are they normal? You know I have this hypothesis that homeworks are bimodal…“*</p>
 <p>Now now George. Here’s all the info you need:</p>
-<p><img src="/images/class-score-analysis/homework-exam-summary.png" alt=""></p>
+<div class="figure">
+<img src="/images/class-score-analysis/homework-exam-summary.png">
+
+</div>
 <p>The mode of some homeworks tend to be around full marks, which is rather unsurprising given the nature of homeworks. Some fulfil all requirements, while others simply throw their hands in the air and well…not do them. This also reflects the content of the homeworks. Homework 3 and 4 tend to have many small (unrelated) parts hence it is entirely possible to score well in one and not others. The rest of them tend to have a larger single programming component.</p>
-<h2 id="Homework-Covariance"><a href="#Homework-Covariance" class="headerlink" title="Homework Covariance"></a>Homework Covariance</h2><p><em>George: Do students do consistenly well / bad in all the homeworks or do they tend to vary quite a bit?</em></p>
+<h2 id="homework-covariance">Homework Covariance</h2>
+<p><em>George: Do students do consistenly well / bad in all the homeworks or do they tend to vary quite a bit?</em></p>
 <p>Great question George! Let’s see. Here we are interested if homework grades, when taken as a whole, move together. That means if Student A scores well in Homework 1, 2, and 3, does he score well in Homework 4 and 5 as well? What about Student B? What about other homeworks?</p>
 <p>Turns out the easiest way to answer this is: what is the <strong>correlation</strong> of the homework scores.</p>
-<p><img src="/images/class-score-analysis/corrplot.png" alt=""></p>
+<div class="figure">
+<img src="/images/class-score-analysis/corrplot.png">
+
+</div>
 <p>Turns out most of them are moderately correlated. We can quantify this further by using <strong>Principal Component Analysis</strong> (PCA). Intuitively, PCA is a method that distills a common “factor” for all the data. After running PCA on the data, we have the following results:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Loadings:</div><div class="line">         Comp.1 Comp.2 Comp.3 Comp.4 Comp.5</div><div class="line">data.hw1 -0.324 -0.103  0.139         0.927</div><div class="line">data.hw2 -0.410 -0.433  0.686  0.317 -0.270</div><div class="line">data.hw3 -0.612        -0.653  0.428       </div><div class="line">data.hw4 -0.510               -0.825 -0.240</div><div class="line">data.hw5 -0.304  0.892  0.286  0.172</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Loadings:</span><br><span class="line">         Comp.1 Comp.2 Comp.3 Comp.4 Comp.5</span><br><span class="line">data.hw1 -0.324 -0.103  0.139         0.927</span><br><span class="line">data.hw2 -0.410 -0.433  0.686  0.317 -0.270</span><br><span class="line">data.hw3 -0.612        -0.653  0.428       </span><br><span class="line">data.hw4 -0.510               -0.825 -0.240</span><br><span class="line">data.hw5 -0.304  0.892  0.286  0.172</span><br></pre></td></tr></table></figure>
 <p>This means that the PCA reduced our data from 5 dimensions (since we had 5 datasets), the first of which is the homeworks moving in the same direction. But how much of the actual change is represented by that dimension? Turns out, quite a lot!</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Importance of components:</div><div class="line">                           Comp.1     Comp.2     Comp.3     Comp.4     Comp.5</div><div class="line">Standard deviation     40.9058984 25.1014708 23.9316752 20.2610806 19.4151851</div><div class="line">Proportion of Variance  0.4567392  0.1719867  0.1563301  0.1120525  0.1028915</div><div class="line">Cumulative Proportion   0.4567392  0.6287259  0.7850560  0.8971085  1.0000000</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Importance of components:</span><br><span class="line">                           Comp.1     Comp.2     Comp.3     Comp.4     Comp.5</span><br><span class="line">Standard deviation     40.9058984 25.1014708 23.9316752 20.2610806 19.4151851</span><br><span class="line">Proportion of Variance  0.4567392  0.1719867  0.1563301  0.1120525  0.1028915</span><br><span class="line">Cumulative Proportion   0.4567392  0.6287259  0.7850560  0.8971085  1.0000000</span><br></pre></td></tr></table></figure>
 <p>The first dimension when all 5 homeworks are moving in the same direction accounts for around 41% of the total amount of variation. That means a common “force” that moves all the homeworks in the same direction accounts for around half the changes in homeworks from student to student.</p>
 <p>This means that students’ homeworks are covaried to a pretty large extent. So George, students who do well in some homeworks tend to do well in others as well.</p>
-<h2 id="Homework-and-Exams"><a href="#Homework-and-Exams" class="headerlink" title="Homework and Exams"></a>Homework and Exams</h2><p><em>George: What about the age old idiom that students who do well in homeworks tend to do better in exams? I was told by my elementary school teacher that…</em></p>
+<h2 id="homework-and-exams">Homework and Exams</h2>
+<p><em>George: What about the age old idiom that students who do well in homeworks tend to do better in exams? I was told by my elementary school teacher that…</em></p>
 <p>Calm your tits George.</p>
 <p>Let’s run a linear regression of homework against midterm and finals. Intuitively, this answers the question: if a question scores one point better on homeworks, how much better does he score on midterms / finals?</p>
 <p>Let’s look at midterms first:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Coefficients:</div><div class="line">            Estimate Std. Error t value Pr(&gt;|t|)    </div><div class="line">(Intercept) 39.82253    4.52721   8.796 7.88e-16 ***</div><div class="line">data$hw      0.07482    0.01105   6.768 1.52e-10 ***</div><div class="line">---</div><div class="line">Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class="line"></div><div class="line">Residual standard error: 13.79 on 193 degrees of freedom</div><div class="line">Multiple R-squared:  0.1918,    Adjusted R-squared:  0.1876 </div><div class="line">F-statistic: 45.81 on 1 and 193 DF,  p-value: 1.523e-10</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Coefficients:</span><br><span class="line">            Estimate Std. Error t value Pr(&gt;|t|)    </span><br><span class="line">(Intercept) 39.82253    4.52721   8.796 7.88e-16 ***</span><br><span class="line">data$hw      0.07482    0.01105   6.768 1.52e-10 ***</span><br><span class="line">---</span><br><span class="line">Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span><br><span class="line"></span><br><span class="line">Residual standard error: 13.79 on 193 degrees of freedom</span><br><span class="line">Multiple R-squared:  0.1918,    Adjusted R-squared:  0.1876 </span><br><span class="line">F-statistic: 45.81 on 1 and 193 DF,  p-value: 1.523e-10</span><br></pre></td></tr></table></figure>
 <p>Turns out homeworks correlate <em>pretty</em> well with midterm. A 1 point increase in homework (remember homeworks are graded out of 500, since I excluded homework 6 which we are still grading at the time of writing) translates into a 0.075 point increase in midterms. This is a pretty significant effect, but the R-squared is rather low, meaning that this does not hold for all students very strictly.</p>
 <p>Let’s look at finals now:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Coefficients:</div><div class="line">            Estimate Std. Error t value Pr(&gt;|t|)    </div><div class="line">(Intercept)  25.3966     4.7103   5.392 2.02e-07 ***</div><div class="line">data$hw       0.1108     0.0115   9.637  &lt; 2e-16 ***</div><div class="line">---</div><div class="line">Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class="line"></div><div class="line">Residual standard error: 14.35 on 193 degrees of freedom</div><div class="line">Multiple R-squared:  0.3249,    Adjusted R-squared:  0.3214 </div><div class="line">F-statistic: 92.87 on 1 and 193 DF,  p-value: &lt; 2.2e-16</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Coefficients:</span><br><span class="line">            Estimate Std. Error t value Pr(&gt;|t|)    </span><br><span class="line">(Intercept)  25.3966     4.7103   5.392 2.02e-07 ***</span><br><span class="line">data$hw       0.1108     0.0115   9.637  &lt; 2e-16 ***</span><br><span class="line">---</span><br><span class="line">Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span><br><span class="line"></span><br><span class="line">Residual standard error: 14.35 on 193 degrees of freedom</span><br><span class="line">Multiple R-squared:  0.3249,    Adjusted R-squared:  0.3214 </span><br><span class="line">F-statistic: 92.87 on 1 and 193 DF,  p-value: &lt; 2.2e-16</span><br></pre></td></tr></table></figure>
 <p>Homeworks correlate a lot better with finals than midterms. Again, a 1 point increase in homework translates into a 0.11 point increase in finals, and we have a higher R-squared here.</p>
-<p><img src="/images/class-score-analysis/homework-midterm-final.png" alt=""></p>
+<div class="figure">
+<img src="/images/class-score-analysis/homework-midterm-final.png">
+
+</div>
 <p>These two correlations are visualized in the scatter plot above.</p>
-<h2 id="Piazza"><a href="#Piazza" class="headerlink" title="Piazza"></a>Piazza</h2><p><em>George: So I’ve been contributing a lot on piazza. My grades are awesome. Does that relationship hold?</em></p>
+<h2 id="piazza">Piazza</h2>
+<p><em>George: So I’ve been contributing a lot on piazza. My grades are awesome. Does that relationship hold?</em></p>
 <p>Finally, I always tell students that the more they use piazza, the better they are able to learn. Asking question gets you answers, which makes you better. Answering answers makes you even better, since you learn way more by teaching than just being spoon-fed.</p>
 <p>Well, you can answer these for yourself here.</p>
-<p><img src="/images/class-score-analysis/piazza-homework.png" alt=""></p>
-<p><img src="/images/class-score-analysis/piazza-midterm.png" alt=""></p>
-<p><img src="/images/class-score-analysis/piazza-final.png" alt=""></p>
+<div class="figure">
+<img src="/images/class-score-analysis/piazza-homework.png">
+
+</div>
+<div class="figure">
+<img src="/images/class-score-analysis/piazza-midterm.png">
+
+</div>
+<div class="figure">
+<img src="/images/class-score-analysis/piazza-final.png">
+
+</div>
 
       
     </div>
