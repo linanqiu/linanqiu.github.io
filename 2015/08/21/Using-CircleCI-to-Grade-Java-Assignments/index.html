@@ -1,79 +1,148 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  
-  <title>Using CircleCI to Grade Java Assignments | Pandamonium | Musings of a Panda</title>
-  <meta name="author" content="Linan Qiu">
-  
-  <meta name="description" content="Linan&#39;s Blog">
-  
-  
-
-  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-
-  <meta property="og:title" content="Using CircleCI to Grade Java Assignments"/>
-  <meta property="og:site_name" content="Pandamonium"/>
-
-  
-    <meta property="og:image" content="undefined"/>
-  
-
-  <link href="/favicon.ico" rel="icon">
-  <link rel="alternate" href="/atom.xml" title="Pandamonium" type="application/atom+xml">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="It’s ridiculous we don’t have a proper solution that uses Continuous Integration (CI) to grade homeworks hosted on GitHub. CI, in short, is just a server that runs unit tests on your code every time y">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Using CircleCI to Grade Java Assignments">
+<meta property="og:url" content="http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/index.html">
+<meta property="og:site_name" content="Pandamonium">
+<meta property="og:description" content="It’s ridiculous we don’t have a proper solution that uses Continuous Integration (CI) to grade homeworks hosted on GitHub. CI, in short, is just a server that runs unit tests on your code every time y">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci1.png">
+<meta property="og:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci2.png">
+<meta property="og:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci3.png">
+<meta property="og:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci4.png">
+<meta property="og:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci5.png">
+<meta property="og:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci6.png">
+<meta property="og:updated_time" content="2015-10-13T17:15:13.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Using CircleCI to Grade Java Assignments">
+<meta name="twitter:description" content="It’s ridiculous we don’t have a proper solution that uses Continuous Integration (CI) to grade homeworks hosted on GitHub. CI, in short, is just a server that runs unit tests on your code every time y">
+<meta name="twitter:image" content="http://linanqiu.github.io/images/Using-CircleCI-to-Grade-Java-Assignments/circleci1.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Using CircleCI to Grade Java Assignments</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
 </head>
 
-
-<body>
-<div id="page" class="site">
-  <div id="primary" class="content-area">
-
-    <header id="header" class="inner"><div class="site-branding">
-  <h1 class="site-title">
-    <a href="/">Pandamonium</a>
-  </h1>
-  <p class="site-description">Musings of a Panda</p>
-</div>
-<nav id="site-navigation" class="main-navigation" role="navigation">
-  <ul>
-    
-      <li><a href="/">Home</a></li>
-    
-      <li><a href="/archives">Archives</a></li>
-    
-  </ul>
-</nav></header>
-
-    <article id="content" class="site-content">
-      <main id="main" class="site-main posts-loop" role="main">
-        <article class="post article">
-
-  
-  
-    <h3 class="article-title"><span>Using CircleCI to Grade Java Assignments</span></h3>
-  
-
-
-  <div class="article-top-meta">
-    <span class="posted-on">
-      <a href="/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/" rel="bookmark">
-        <time class="entry-date published" datetime="2015-08-21T18:51:24.000Z">
-          2015-08-21
-        </time>
-      </a>
+<body class="max-width mx-auto px3 ltr">    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="https://github.com/linanqiu">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
     </span>
-  </div>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2015/10/07/word2vec-sentiment/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2015/07/09/greece-cash/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&text=Using CircleCI to Grade Java Assignments"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&is_video=false&description=Using CircleCI to Grade Java Assignments"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Using CircleCI to Grade Java Assignments&body=Check out this article: http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&name=Using CircleCI to Grade Java Assignments&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#homework-assignment"><span class="toc-number">1.</span> <span class="toc-text">Homework Assignment</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setting-up-circleci"><span class="toc-number">2.</span> <span class="toc-text">Setting up CircleCI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#game-plan"><span class="toc-number">3.</span> <span class="toc-text">Game Plan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#overriding-circle.yml"><span class="toc-number">4.</span> <span class="toc-text">Overriding circle.yml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#creating-build.sh"><span class="toc-number">5.</span> <span class="toc-text">Creating build.sh</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#creating-a-grader-tool-in-java"><span class="toc-number">6.</span> <span class="toc-text">Creating a Grader Tool in Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pushing-to-github"><span class="toc-number">7.</span> <span class="toc-text">Pushing to GitHub</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setting-up-circleci-1"><span class="toc-number">8.</span> <span class="toc-text">Setting up CircleCI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#grade-on-commit"><span class="toc-number">9.</span> <span class="toc-text">Grade On Commit</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Using CircleCI to Grade Java Assignments
+    </h1>
 
 
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Pandamonium</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2015-08-21T18:51:24.000Z" itemprop="datePublished">2015-08-21</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
   
 
-  <div class="article-content">
-    <div class="entry">
-      
-        <p>It’s ridiculous we don’t have a proper solution that uses Continuous Integration (CI) to grade homeworks hosted on GitHub.</p>
+  <div class="content" itemprop="articleBody">
+    <p>It’s ridiculous we don’t have a proper solution that uses Continuous Integration (CI) to grade homeworks hosted on GitHub.</p>
 <p>CI, in short, is just a server that runs unit tests on your code every time you commit it. That means instead of you having to run unit tests before your commit your code (or manually run them after you commit them), a little robot checks your code against your unit tests every time you commit the code. That little robot never gets tired, doesn’t need to be fed. In short, these little robots are way better than human Teaching Assistants (TAs) (who in contrast, need to be fed pizza).</p>
 <p>Given that I’ll be Head TAing a class with nearly 300 students this fall, I can’t afford enough pizzas to keep my team running. Or maybe I can, but I prefer not to. So why not get CI servers to grade homeworks? That requires two things:</p>
 <ol style="list-style-type: decimal">
@@ -164,76 +233,98 @@
 </div>
 <p>Isn’t this awesome? Even awesome-er, CircleCI has a great API. That means you can use this to create a live scoreboard for your students / email notifications every time they submit code.</p>
 
-      
-    </div>
-    <footer class="article-footer">
-        <div class="article-meta pull-left">
-          
-          
-        </div>
-        
-    </footer>
   </div>
 </article>
 
-  
 
 
-
-      </main>
-    </article>
-
-    <footer id="colophon" class="site-footer" role="contentinfo"><p class="site-info">
-  Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
-  Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
-  </br>
-  
-  &copy; 2018 Linan Qiu
-  
-</p>
-</footer>
+    </div>
     
-<script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      <div id="footer-post-container">
+  <div id="footer-post">
 
-    ga('create', 'UA-66827435-1', 'auto');
-    ga('send', 'pageview');
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="https://github.com/linanqiu">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
 
-</script>
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#homework-assignment"><span class="toc-number">1.</span> <span class="toc-text">Homework Assignment</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setting-up-circleci"><span class="toc-number">2.</span> <span class="toc-text">Setting up CircleCI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#game-plan"><span class="toc-number">3.</span> <span class="toc-text">Game Plan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#overriding-circle.yml"><span class="toc-number">4.</span> <span class="toc-text">Overriding circle.yml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#creating-build.sh"><span class="toc-number">5.</span> <span class="toc-text">Creating build.sh</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#creating-a-grader-tool-in-java"><span class="toc-number">6.</span> <span class="toc-text">Creating a Grader Tool in Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pushing-to-github"><span class="toc-number">7.</span> <span class="toc-text">Pushing to GitHub</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setting-up-circleci-1"><span class="toc-number">8.</span> <span class="toc-text">Setting up CircleCI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#grade-on-commit"><span class="toc-number">9.</span> <span class="toc-text">Grade On Commit</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&text=Using CircleCI to Grade Java Assignments"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&is_video=false&description=Using CircleCI to Grade Java Assignments"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Using CircleCI to Grade Java Assignments&body=Check out this article: http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&title=Using CircleCI to Grade Java Assignments"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://linanqiu.github.io/2015/08/21/Using-CircleCI-to-Grade-Java-Assignments/&name=Using CircleCI to Grade Java Assignments&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
 
   </div>
 </div>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2018 Linan Qiu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="https://github.com/linanqiu">Projects</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
 
 </body>
 </html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
