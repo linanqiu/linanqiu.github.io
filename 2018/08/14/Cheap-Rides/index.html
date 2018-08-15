@@ -73,9 +73,8 @@
   <div class="article-content">
     <div class="entry">
       
-        <p>This notebook is available here: <a href="https://gist.github.com/linanqiu/87a0c708b3f7383fc56c2eb87ab8b087" class="uri" target="_blank" rel="external">https://gist.github.com/linanqiu/87a0c708b3f7383fc56c2eb87ab8b087</a></p>
-<h1 id="cheap-rides">Cheap Rides</h1>
-<p>My friend came up to me with a startup idea.</p>
+        <p>This notebook is available here: <a href="https://gist.github.com/linanqiu/87a0c708b3f7383fc56c2eb87ab8b087" target="_blank" rel="external">https://gist.github.com/linanqiu/87a0c708b3f7383fc56c2eb87ab8b087</a></p>
+<h1 id="Cheap-Rides"><a href="#Cheap-Rides" class="headerlink" title="Cheap Rides"></a>Cheap Rides</h1><p>My friend came up to me with a startup idea.</p>
 <blockquote>
 <p>“Hey what if you could compare Uber and Lyft prices and get the cheapest one? What if you make that a service? …<em>more pitching</em>…”</p>
 </blockquote>
@@ -88,171 +87,19 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">payload_lyft = dict(payload)</div><div class="line"></div><div class="line">headers_lyft = &#123;</div><div class="line">    <span class="string">'Authorization'</span>: <span class="string">'Bearer %s'</span> % CLIENT_TOKEN_LYFT,</div><div class="line">    <span class="string">'Content-type'</span>: <span class="string">'application/json'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">estimate_lyft = requests.get(<span class="string">'https://api.lyft.com/v1/cost'</span>, params=payload_lyft, headers=headers_lyft)</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">payload_uber = dict(((k.replace(<span class="string">'lat'</span>, <span class="string">'latitude'</span>).replace(<span class="string">'lng'</span>, <span class="string">'longitude'</span>), v) <span class="keyword">for</span> k, v <span class="keyword">in</span> payload.items()))</div><div class="line"></div><div class="line">headers_uber = &#123;</div><div class="line">    <span class="string">'Authorization'</span>: <span class="string">'Bearer %s'</span> % CLIENT_TOKEN_UBER,</div><div class="line">    <span class="string">'Content-type'</span>: <span class="string">'application/json'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">estimate_uber = requests.get(<span class="string">'https://api.uber.com/v1.2/estimates/price'</span>, params=payload_uber, headers=headers_uber)</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">print(estimate_lyft.content)</div><div class="line">print(estimate_uber.content)</div></pre></td></tr></table></figure>
-<pre><code>b&#39;{&quot;cost_estimates&quot;: [{&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_line&quot;, &quot;display_name&quot;: &quot;Shared&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 900, &quot;estimated_cost_cents_max&quot;: 1200, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft&quot;, &quot;display_name&quot;: &quot;Lyft&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 2000, &quot;estimated_cost_cents_max&quot;: 2500, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_plus&quot;, &quot;display_name&quot;: &quot;Lyft XL&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 3000, &quot;estimated_cost_cents_max&quot;: 3500, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_lux&quot;, &quot;display_name&quot;: &quot;Lux Black&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 4200, &quot;estimated_cost_cents_max&quot;: 4900, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_luxsuv&quot;, &quot;display_name&quot;: &quot;Lux Black XL&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 6000, &quot;estimated_cost_cents_max&quot;: 7000, &quot;can_request_ride&quot;: true}]}\n&#39;
-b&#39;{&quot;prices&quot;:[{&quot;localized_display_name&quot;:&quot;UberPool&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;UberPool&quot;,&quot;product_id&quot;:&quot;929fcc19-8cb4-4007-a54f-3ab34473700f&quot;,&quot;high_estimate&quot;:16.0,&quot;low_estimate&quot;:11.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$11-15&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;UberXL&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;UberXL&quot;,&quot;product_id&quot;:&quot;1e0ce2df-4a1e-4333-86dd-dc0c67aaabe1&quot;,&quot;high_estimate&quot;:36.0,&quot;low_estimate&quot;:29.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$29-36&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;UberX&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;UberX&quot;,&quot;product_id&quot;:&quot;b8e5c464-5de2-4539-a35a-986d6e58f186&quot;,&quot;high_estimate&quot;:28.0,&quot;low_estimate&quot;:22.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$22-28&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;Car Seat&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;Car Seat&quot;,&quot;product_id&quot;:&quot;d6d6d7ad-67f9-43ef-a8de-86bd6224613a&quot;,&quot;high_estimate&quot;:39.0,&quot;low_estimate&quot;:31.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$31-39&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;Black&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;Black&quot;,&quot;product_id&quot;:&quot;0e9d8dd3-ffec-4c2b-9714-537e6174bb88&quot;,&quot;high_estimate&quot;:50.0,&quot;low_estimate&quot;:40.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$40-50&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;Black SUV&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;Black SUV&quot;,&quot;product_id&quot;:&quot;56487469-0d3d-4f19-b662-234b7576a562&quot;,&quot;high_estimate&quot;:66.0,&quot;low_estimate&quot;:53.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$53-66&quot;,&quot;currency_code&quot;:&quot;USD&quot;}]}&#39;</code></pre>
-<p>Now we can normalize these JSON blobs into a canonical form I care about: the <code>id</code> for a quote, the <code>app</code> of origin of the quote, the <code>ride_type</code> (e.g. Lyft Line vs Uber XL), <code>distance</code>, <code>cost_min</code>, <code>cost_max</code> and the currency of the quote <code>cost_currency</code>. These information exist in both return contents, but in different formats (be it time, currency, or distance). I use the <code>pint</code> package to represent units instead of doing stupid integer math on my own. <strong>Strong typing ftw. Even in <code>Python</code></strong>.</p>
+<pre><code>b&apos;{&quot;cost_estimates&quot;: [{&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_line&quot;, &quot;display_name&quot;: &quot;Shared&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 900, &quot;estimated_cost_cents_max&quot;: 1200, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft&quot;, &quot;display_name&quot;: &quot;Lyft&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 2000, &quot;estimated_cost_cents_max&quot;: 2500, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_plus&quot;, &quot;display_name&quot;: &quot;Lyft XL&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 3000, &quot;estimated_cost_cents_max&quot;: 3500, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_lux&quot;, &quot;display_name&quot;: &quot;Lux Black&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 4200, &quot;estimated_cost_cents_max&quot;: 4900, &quot;can_request_ride&quot;: true}, {&quot;currency&quot;: &quot;USD&quot;, &quot;ride_type&quot;: &quot;lyft_luxsuv&quot;, &quot;display_name&quot;: &quot;Lux Black XL&quot;, &quot;primetime_percentage&quot;: &quot;0%&quot;, &quot;primetime_confirmation_token&quot;: null, &quot;cost_token&quot;: null, &quot;price_quote_id&quot;: &quot;ENq21tjTLA==&quot;, &quot;is_valid_estimate&quot;: true, &quot;estimated_duration_seconds&quot;: 1498, &quot;estimated_distance_miles&quot;: 6.25, &quot;estimated_cost_cents_min&quot;: 6000, &quot;estimated_cost_cents_max&quot;: 7000, &quot;can_request_ride&quot;: true}]}\n&apos;
+b&apos;{&quot;prices&quot;:[{&quot;localized_display_name&quot;:&quot;UberPool&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;UberPool&quot;,&quot;product_id&quot;:&quot;929fcc19-8cb4-4007-a54f-3ab34473700f&quot;,&quot;high_estimate&quot;:16.0,&quot;low_estimate&quot;:11.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$11-15&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;UberXL&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;UberXL&quot;,&quot;product_id&quot;:&quot;1e0ce2df-4a1e-4333-86dd-dc0c67aaabe1&quot;,&quot;high_estimate&quot;:36.0,&quot;low_estimate&quot;:29.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$29-36&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;UberX&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;UberX&quot;,&quot;product_id&quot;:&quot;b8e5c464-5de2-4539-a35a-986d6e58f186&quot;,&quot;high_estimate&quot;:28.0,&quot;low_estimate&quot;:22.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$22-28&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;Car Seat&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;Car Seat&quot;,&quot;product_id&quot;:&quot;d6d6d7ad-67f9-43ef-a8de-86bd6224613a&quot;,&quot;high_estimate&quot;:39.0,&quot;low_estimate&quot;:31.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$31-39&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;Black&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;Black&quot;,&quot;product_id&quot;:&quot;0e9d8dd3-ffec-4c2b-9714-537e6174bb88&quot;,&quot;high_estimate&quot;:50.0,&quot;low_estimate&quot;:40.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$40-50&quot;,&quot;currency_code&quot;:&quot;USD&quot;},{&quot;localized_display_name&quot;:&quot;Black SUV&quot;,&quot;distance&quot;:5.62,&quot;display_name&quot;:&quot;Black SUV&quot;,&quot;product_id&quot;:&quot;56487469-0d3d-4f19-b662-234b7576a562&quot;,&quot;high_estimate&quot;:66.0,&quot;low_estimate&quot;:53.0,&quot;duration&quot;:1380,&quot;estimate&quot;:&quot;$53-66&quot;,&quot;currency_code&quot;:&quot;USD&quot;}]}&apos;
+</code></pre><p>Now we can normalize these JSON blobs into a canonical form I care about: the <code>id</code> for a quote, the <code>app</code> of origin of the quote, the <code>ride_type</code> (e.g. Lyft Line vs Uber XL), <code>distance</code>, <code>cost_min</code>, <code>cost_max</code> and the currency of the quote <code>cost_currency</code>. These information exist in both return contents, but in different formats (be it time, currency, or distance). I use the <code>pint</code> package to represent units instead of doing stupid integer math on my own. <strong>Strong typing ftw. Even in <code>Python</code></strong>.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">ureg = pint.UnitRegistry()</div><div class="line"></div><div class="line">estimate_lyft_obj = estimate_lyft.json()</div><div class="line">estimate_lyft_norm = (&#123;</div><div class="line">    <span class="string">'id'</span>: est[<span class="string">'price_quote_id'</span>],</div><div class="line">    <span class="string">'app'</span>: <span class="string">'lyft'</span>,</div><div class="line">    <span class="string">'ride_type'</span>: est[<span class="string">'ride_type'</span>],</div><div class="line">    <span class="string">'distance'</span>: est[<span class="string">'estimated_distance_miles'</span>] * ureg.mile,</div><div class="line">    <span class="string">'duration'</span>: est[<span class="string">'estimated_duration_seconds'</span>] * ureg.second,</div><div class="line">    <span class="string">'cost_min'</span>: est[<span class="string">'estimated_cost_cents_min'</span>] / <span class="number">100</span>,</div><div class="line">    <span class="string">'cost_max'</span>: est[<span class="string">'estimated_cost_cents_max'</span>] / <span class="number">100</span>,</div><div class="line">    <span class="string">'cost_currency'</span>: est[<span class="string">'currency'</span>]</div><div class="line">&#125; <span class="keyword">for</span> est <span class="keyword">in</span> estimate_lyft_obj[<span class="string">'cost_estimates'</span>])</div><div class="line"></div><div class="line">estimate_uber_obj = estimate_uber.json()</div><div class="line">estimate_uber_norm = (&#123;</div><div class="line">    <span class="string">'id'</span>: est[<span class="string">'product_id'</span>],</div><div class="line">    <span class="string">'app'</span>: <span class="string">'uber'</span>,</div><div class="line">    <span class="string">'ride_type'</span>: est[<span class="string">'display_name'</span>],</div><div class="line">    <span class="string">'distance'</span>: est[<span class="string">'distance'</span>] * ureg.mile,</div><div class="line">    <span class="string">'duration'</span>: est[<span class="string">'duration'</span>] * ureg.second,</div><div class="line">    <span class="string">'cost_min'</span>: est[<span class="string">'low_estimate'</span>],</div><div class="line">    <span class="string">'cost_max'</span>: est[<span class="string">'high_estimate'</span>],</div><div class="line">    <span class="string">'cost_currency'</span>: est[<span class="string">'currency_code'</span>]</div><div class="line">&#125; <span class="keyword">for</span> est <span class="keyword">in</span> estimate_uber_obj[<span class="string">'prices'</span>])</div><div class="line"></div><div class="line">estimate_norm = list(itertools.chain(estimate_lyft_norm, estimate_uber_norm))</div></pre></td></tr></table></figure>
 <p>Now let’s see what lovely data we have. Turns out we have tons of that.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">estimate_df = pandas.DataFrame(estimate_norm)</div><div class="line">estimate_df</div></pre></td></tr></table></figure>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div><br><style scoped><br>    .dataframe tbody tr th:only-of-type {<br>        vertical-align: middle;<br>    }<br><br>    .dataframe tbody tr th {<br>        vertical-align: top;<br>    }<br><br>    .dataframe thead th {<br>        text-align: right;<br>    }<br></style><br><table border="1" class="dataframe"><br>  <thead><br>    <tr style="text-align: right;"><br>      <th></th><br>      <th>app</th><br>      <th>cost_currency</th><br>      <th>cost_max</th><br>      <th>cost_min</th><br>      <th>distance</th><br>      <th>duration</th><br>      <th>id</th><br>      <th>ride_type</th><br>    </tr><br>  </thead><br>  <tbody><br>    <tr><br>      <th>0</th><br>      <td>lyft</td><br>      <td>USD</td><br>      <td>12.0</td><br>      <td>9.0</td><br>      <td>6.25 mile</td><br>      <td>1498 second</td><br>      <td>ENq21tjTLA==</td><br>      <td>lyft_line</td><br>    </tr><br>    <tr><br>      <th>1</th><br>      <td>lyft</td><br>      <td>USD</td><br>      <td>25.0</td><br>      <td>20.0</td><br>      <td>6.25 mile</td><br>      <td>1498 second</td><br>      <td>ENq21tjTLA==</td><br>      <td>lyft</td><br>    </tr><br>    <tr><br>      <th>2</th><br>      <td>lyft</td><br>      <td>USD</td><br>      <td>35.0</td><br>      <td>30.0</td><br>      <td>6.25 mile</td><br>      <td>1498 second</td><br>      <td>ENq21tjTLA==</td><br>      <td>lyft_plus</td><br>    </tr><br>    <tr><br>      <th>3</th><br>      <td>lyft</td><br>      <td>USD</td><br>      <td>49.0</td><br>      <td>42.0</td><br>      <td>6.25 mile</td><br>      <td>1498 second</td><br>      <td>ENq21tjTLA==</td><br>      <td>lyft_lux</td><br>    </tr><br>    <tr><br>      <th>4</th><br>      <td>lyft</td><br>      <td>USD</td><br>      <td>70.0</td><br>      <td>60.0</td><br>      <td>6.25 mile</td><br>      <td>1498 second</td><br>      <td>ENq21tjTLA==</td><br>      <td>lyft_luxsuv</td><br>    </tr><br>    <tr><br>      <th>5</th><br>      <td>uber</td><br>      <td>USD</td><br>      <td>16.0</td><br>      <td>11.0</td><br>      <td>5.62 mile</td><br>      <td>1380 second</td><br>      <td>929fcc19-8cb4-4007-a54f-3ab34473700f</td><br>      <td>UberPool</td><br>    </tr><br>    <tr><br>      <th>6</th><br>      <td>uber</td><br>      <td>USD</td><br>      <td>36.0</td><br>      <td>29.0</td><br>      <td>5.62 mile</td><br>      <td>1380 second</td><br>      <td>1e0ce2df-4a1e-4333-86dd-dc0c67aaabe1</td><br>      <td>UberXL</td><br>    </tr><br>    <tr><br>      <th>7</th><br>      <td>uber</td><br>      <td>USD</td><br>      <td>28.0</td><br>      <td>22.0</td><br>      <td>5.62 mile</td><br>      <td>1380 second</td><br>      <td>b8e5c464-5de2-4539-a35a-986d6e58f186</td><br>      <td>UberX</td><br>    </tr><br>    <tr><br>      <th>8</th><br>      <td>uber</td><br>      <td>USD</td><br>      <td>39.0</td><br>      <td>31.0</td><br>      <td>5.62 mile</td><br>      <td>1380 second</td><br>      <td>d6d6d7ad-67f9-43ef-a8de-86bd6224613a</td><br>      <td>Car Seat</td><br>    </tr><br>    <tr><br>      <th>9</th><br>      <td>uber</td><br>      <td>USD</td><br>      <td>50.0</td><br>      <td>40.0</td><br>      <td>5.62 mile</td><br>      <td>1380 second</td><br>      <td>0e9d8dd3-ffec-4c2b-9714-537e6174bb88</td><br>      <td>Black</td><br>    </tr><br>    <tr><br>      <th>10</th><br>      <td>uber</td><br>      <td>USD</td><br>      <td>66.0</td><br>      <td>53.0</td><br>      <td>5.62 mile</td><br>      <td>1380 second</td><br>      <td>56487469-0d3d-4f19-b662-234b7576a562</td><br>      <td>Black SUV</td><br>    </tr><br>  </tbody><br></table><br></div>
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
 
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<pre><code>&lt;tr style=&quot;text-align: right;&quot;&gt;
-  &lt;th&gt;&lt;/th&gt;
-  &lt;th&gt;app&lt;/th&gt;
-  &lt;th&gt;cost_currency&lt;/th&gt;
-  &lt;th&gt;cost_max&lt;/th&gt;
-  &lt;th&gt;cost_min&lt;/th&gt;
-  &lt;th&gt;distance&lt;/th&gt;
-  &lt;th&gt;duration&lt;/th&gt;
-  &lt;th&gt;id&lt;/th&gt;
-  &lt;th&gt;ride_type&lt;/th&gt;
-&lt;/tr&gt;</code></pre>
-</thead>
-<tbody>
-<pre><code>&lt;tr&gt;
-  &lt;th&gt;0&lt;/th&gt;
-  &lt;td&gt;lyft&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;12.0&lt;/td&gt;
-  &lt;td&gt;9.0&lt;/td&gt;
-  &lt;td&gt;6.25 mile&lt;/td&gt;
-  &lt;td&gt;1498 second&lt;/td&gt;
-  &lt;td&gt;ENq21tjTLA==&lt;/td&gt;
-  &lt;td&gt;lyft_line&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;1&lt;/th&gt;
-  &lt;td&gt;lyft&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;25.0&lt;/td&gt;
-  &lt;td&gt;20.0&lt;/td&gt;
-  &lt;td&gt;6.25 mile&lt;/td&gt;
-  &lt;td&gt;1498 second&lt;/td&gt;
-  &lt;td&gt;ENq21tjTLA==&lt;/td&gt;
-  &lt;td&gt;lyft&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;2&lt;/th&gt;
-  &lt;td&gt;lyft&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;35.0&lt;/td&gt;
-  &lt;td&gt;30.0&lt;/td&gt;
-  &lt;td&gt;6.25 mile&lt;/td&gt;
-  &lt;td&gt;1498 second&lt;/td&gt;
-  &lt;td&gt;ENq21tjTLA==&lt;/td&gt;
-  &lt;td&gt;lyft_plus&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;3&lt;/th&gt;
-  &lt;td&gt;lyft&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;49.0&lt;/td&gt;
-  &lt;td&gt;42.0&lt;/td&gt;
-  &lt;td&gt;6.25 mile&lt;/td&gt;
-  &lt;td&gt;1498 second&lt;/td&gt;
-  &lt;td&gt;ENq21tjTLA==&lt;/td&gt;
-  &lt;td&gt;lyft_lux&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;4&lt;/th&gt;
-  &lt;td&gt;lyft&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;70.0&lt;/td&gt;
-  &lt;td&gt;60.0&lt;/td&gt;
-  &lt;td&gt;6.25 mile&lt;/td&gt;
-  &lt;td&gt;1498 second&lt;/td&gt;
-  &lt;td&gt;ENq21tjTLA==&lt;/td&gt;
-  &lt;td&gt;lyft_luxsuv&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;5&lt;/th&gt;
-  &lt;td&gt;uber&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;16.0&lt;/td&gt;
-  &lt;td&gt;11.0&lt;/td&gt;
-  &lt;td&gt;5.62 mile&lt;/td&gt;
-  &lt;td&gt;1380 second&lt;/td&gt;
-  &lt;td&gt;929fcc19-8cb4-4007-a54f-3ab34473700f&lt;/td&gt;
-  &lt;td&gt;UberPool&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;6&lt;/th&gt;
-  &lt;td&gt;uber&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;36.0&lt;/td&gt;
-  &lt;td&gt;29.0&lt;/td&gt;
-  &lt;td&gt;5.62 mile&lt;/td&gt;
-  &lt;td&gt;1380 second&lt;/td&gt;
-  &lt;td&gt;1e0ce2df-4a1e-4333-86dd-dc0c67aaabe1&lt;/td&gt;
-  &lt;td&gt;UberXL&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;7&lt;/th&gt;
-  &lt;td&gt;uber&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;28.0&lt;/td&gt;
-  &lt;td&gt;22.0&lt;/td&gt;
-  &lt;td&gt;5.62 mile&lt;/td&gt;
-  &lt;td&gt;1380 second&lt;/td&gt;
-  &lt;td&gt;b8e5c464-5de2-4539-a35a-986d6e58f186&lt;/td&gt;
-  &lt;td&gt;UberX&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;8&lt;/th&gt;
-  &lt;td&gt;uber&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;39.0&lt;/td&gt;
-  &lt;td&gt;31.0&lt;/td&gt;
-  &lt;td&gt;5.62 mile&lt;/td&gt;
-  &lt;td&gt;1380 second&lt;/td&gt;
-  &lt;td&gt;d6d6d7ad-67f9-43ef-a8de-86bd6224613a&lt;/td&gt;
-  &lt;td&gt;Car Seat&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;9&lt;/th&gt;
-  &lt;td&gt;uber&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;50.0&lt;/td&gt;
-  &lt;td&gt;40.0&lt;/td&gt;
-  &lt;td&gt;5.62 mile&lt;/td&gt;
-  &lt;td&gt;1380 second&lt;/td&gt;
-  &lt;td&gt;0e9d8dd3-ffec-4c2b-9714-537e6174bb88&lt;/td&gt;
-  &lt;td&gt;Black&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;th&gt;10&lt;/th&gt;
-  &lt;td&gt;uber&lt;/td&gt;
-  &lt;td&gt;USD&lt;/td&gt;
-  &lt;td&gt;66.0&lt;/td&gt;
-  &lt;td&gt;53.0&lt;/td&gt;
-  &lt;td&gt;5.62 mile&lt;/td&gt;
-  &lt;td&gt;1380 second&lt;/td&gt;
-  &lt;td&gt;56487469-0d3d-4f19-b662-234b7576a562&lt;/td&gt;
-  &lt;td&gt;Black SUV&lt;/td&gt;
-&lt;/tr&gt;</code></pre>
-</tbody>
-</table>
-</div>
+
 <p>We get pretty interesting observations: right now, Uber’s more expensive than Lyft by two whole bucks. That’s interesting! No? Yes? Whatever.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">fig, ax = plt.subplots()</div><div class="line"><span class="comment"># sorry for ugly indents. fucking python.</span></div><div class="line">estimate_df[</div><div class="line">    [<span class="string">'app'</span>, <span class="string">'ride_type'</span>, <span class="string">'cost_min'</span>, <span class="string">'cost_max'</span>]</div><div class="line">].set_index(</div><div class="line">    [<span class="string">'app'</span>, <span class="string">'ride_type'</span>]</div><div class="line">).sort_values(</div><div class="line">    [<span class="string">'app'</span>, <span class="string">'cost_min'</span>, <span class="string">'cost_max'</span>]</div><div class="line">).plot(kind=<span class="string">'bar'</span>, ax=ax)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/cheap-rides/output_14_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/cheap-rides/output_14_0.svg" alt="svg"></p>
 <p>I showed this to my roommate and he’s still convinced this is a great startup idea.</p>
 
       

@@ -86,30 +86,18 @@
 <p>Now we can plot our first graph. This plots the futures curve at a certain date.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_year_curve</span><span class="params">(date)</span>:</span></div><div class="line">    pyplot.plot(extract_year(get_curve(dataframes, date)))</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">plot_year_curve(datetime.datetime(<span class="number">2016</span>, <span class="number">1</span>, <span class="number">8</span>))</div><div class="line">pyplot.show()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Oil-Futures-Curve-Visualization/output_8_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Oil-Futures-Curve-Visualization/output_8_0.svg" alt="svg"></p>
 <p>That’s useful, but what I really want to know is how the futures curve has shifted over the last few days. I can do this by plotting a whole bunch of these lines, and varying the gradient such that the ones far back in time are red, and the recent ones are green.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_year_curve_range</span><span class="params">(date, shift_back_days)</span>:</span></div><div class="line">    date_list = [date - datetime.timedelta(days=x) <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">0</span>, shift_back_days)]</div><div class="line">    <span class="keyword">for</span> index, date <span class="keyword">in</span> enumerate(date_list):</div><div class="line">        color = (index / len(date_list))</div><div class="line">        pyplot.plot(extract_year(get_curve(dataframes, date)), color=(color, <span class="number">1</span>-color, <span class="number">0</span>), linewidth=<span class="number">1</span>)</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">plot_year_curve_range(datetime.datetime(<span class="number">2016</span>, <span class="number">1</span>, <span class="number">8</span>), <span class="number">30</span>)</div><div class="line">pyplot.show()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Oil-Futures-Curve-Visualization/output_11_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Oil-Futures-Curve-Visualization/output_11_0.svg" alt="svg"></p>
 <p>The plot above is the futures curve for the last 30 days (non-trading days are included, so there are less than 30 lines in the graph). What we see that initially, the curve flattened, then dropped in a parallel manner, and finally steepening again. In fact, we can visualize the recent steepening a little closer by looking at the last 10 days.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">plot_year_curve_range(datetime.datetime(<span class="number">2016</span>, <span class="number">1</span>, <span class="number">8</span>), <span class="number">10</span>)</div><div class="line">pyplot.show()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Oil-Futures-Curve-Visualization/output_13_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Oil-Futures-Curve-Visualization/output_13_0.svg" alt="svg"></p>
 <p>This shows that over the last 10 days, the curve has fallen somewhat more on the short end than on the long end (37 to 33 vs 44 to 41).</p>
 <p>We can also abuse this for cool artistic effects.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">plot_year_curve_range(datetime.datetime(<span class="number">2016</span>, <span class="number">1</span>, <span class="number">8</span>), <span class="number">360</span>)</div><div class="line">pyplot.show()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Oil-Futures-Curve-Visualization/output_15_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Oil-Futures-Curve-Visualization/output_15_0.svg" alt="svg"></p>
 
       
     </div>

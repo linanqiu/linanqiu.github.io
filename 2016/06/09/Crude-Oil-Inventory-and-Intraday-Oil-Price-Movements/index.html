@@ -74,62 +74,36 @@
     <div class="entry">
       
         <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">%matplotlib inline</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line">plt.style.use(<span class="string">'ggplot'</span>)</div><div class="line">%config InlineBackend.figure_format = <span class="string">'svg'</span></div></pre></td></tr></table></figure>
-<h1 id="motivation">Motivation</h1>
-<p><a href="http://www.wsj.com/articles/oil-at-seven-month-high-as-u-s-stockpiles-drop-1464168624" target="_blank" rel="external">News</a> <a href="http://www.marketwatch.com/story/oil-prices-march-past-50-amid-signs-of-us-inventory-falls-2016-06-08" target="_blank" rel="external">articles</a> love citing the crude inventory as reasons for movements in oil prices. Quoting from the WSJ:</p>
+<h1 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h1><p><a href="http://www.wsj.com/articles/oil-at-seven-month-high-as-u-s-stockpiles-drop-1464168624" target="_blank" rel="external">News</a> <a href="http://www.marketwatch.com/story/oil-prices-march-past-50-amid-signs-of-us-inventory-falls-2016-06-08" target="_blank" rel="external">articles</a> love citing the crude inventory as reasons for movements in oil prices. Quoting from the WSJ:</p>
 <blockquote>
 <p>U.S. inventories are closely watched by traders as the first indicator of the global supply-and-demand balance. Stockpiles have fallen in recent weeks from their highest level in more than 80 years, boosting expectations that the global glut of crude that has weighed on prices for nearly two years is now receding.</p>
-</blockquote>
-<blockquote>
 <p>The U.S. Energy Information Administration said U.S. crude stockpiles fell 4.2 million barrels last week, while analysts polled by The Wall Street Journal had expected a decrease of 2.5 million barrels.</p>
 </blockquote>
 <p>So this got me really curious. How good is the Energy Information Administration (EIA) figure as a predictor of crude oil prices? To test this, I decided to use the following data:</p>
-<ol style="list-style-type: decimal">
+<ol>
 <li>EIA US Crude Inventory ex-SPR (Strategic Petroleum Reserve). This data (basically the one that WSJ quoted on top) is <strong>usually released every Wednesday afternoon</strong>. This data is going to be a single number for every week.</li>
 <li>US Oil Fund (USO), an ETF that tracks the front month West Texas Intermediate (WTI) futures. This is going to be a set of numbers daily describing the <strong>open, high, low, close</strong> (OHLC) prices. We are most interested in the extent of movement from the beginning of the day (before EIA data is released) to the end of the day (after EIA data is released). Hence, we define <strong>intraday return</strong> as <strong>(close - open) / close</strong> for a specific day. Furthermore, we are probably interested in this figure for <strong>Wednesdays</strong> given that EIA data is released every Wednesday.</li>
 </ol>
-<h1 id="data">Data</h1>
-<p>I pull the data from Thomson Datastream using this <a href="https://github.com/vfilimonov/pydatastream" target="_blank" rel="external">wonderful Python interface</a>. If you want to replicate this, you’d need to get yourself some Datastream credentials. Ask your school librarian very nicely. :)</p>
+<h1 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h1><p>I pull the data from Thomson Datastream using this <a href="https://github.com/vfilimonov/pydatastream" target="_blank" rel="external">wonderful Python interface</a>. If you want to replicate this, you’d need to get yourself some Datastream credentials. Ask your school librarian very nicely. :)</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> pydatastream</div><div class="line"><span class="keyword">from</span> pydatastream <span class="keyword">import</span> Datastream</div><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> csv</div><div class="line"><span class="keyword">import</span> pandas</div><div class="line"><span class="keyword">import</span> statsmodels.graphics.tsaplots <span class="keyword">as</span> tsaplots</div><div class="line"><span class="keyword">import</span> statsmodels.formula.api <span class="keyword">as</span> sm</div><div class="line"></div><div class="line">credentials = &#123;&#125;</div><div class="line"><span class="keyword">with</span> open(<span class="string">'credentials.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> credentials_file:</div><div class="line">    line = credentials_file.readline().split(<span class="string">','</span>)</div><div class="line">    credentials[<span class="string">'username'</span>] = line[<span class="number">0</span>]</div><div class="line">    credentials[<span class="string">'password'</span>] = line[<span class="number">1</span>]</div><div class="line"></div><div class="line">DWE = Datastream(username=credentials[<span class="string">'username'</span>], password=credentials[<span class="string">'password'</span>])</div><div class="line">DWE.raise_on_error = <span class="keyword">False</span></div></pre></td></tr></table></figure>
 <p>The crude oil inventory data has the datastream mnemonic <code>EIA2007</code> (trust me it took me like 2 hours to find it.) Then I plot it to inject some pictures into this post (otherwise you’d find it boring right?) Besides everyone likes pictures.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">crude_oil_stock = DWE.fetch([<span class="string">'EIA2007'</span>], date_from=<span class="string">'2000-01-01'</span>, freq=<span class="string">'D'</span>)</div><div class="line">uso = DWE.get_OHLC(<span class="string">'U:USO'</span>, date_from=<span class="string">'2000-01-01'</span>)</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">crude_oil_stock.plot()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_6_1.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_6_1.svg" alt="svg"></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">uso.plot()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_7_1.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_7_1.svg" alt="svg"></p>
 <p>Uh oh looks like we don’t have complete data before late 2009. Oh well. We just truncate our analysis then.</p>
 <p>Now let’s subdivide our data into each of the days of the week: Monday till Friday.</p>
 <p>Also, Thomson Datastream’s crude oil stock data seems to be lagged by 2 days. That is, Wednesday’s data seems to only be in the system by Friday. Hence, I shift the inventory data by <code>-2</code> days.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">data = crude_oil_stock.merge(uso, left_index=<span class="keyword">True</span>, right_index=<span class="keyword">True</span>)</div><div class="line">data.columns=[<span class="string">'crude_oil_stock'</span>, <span class="string">'uso_close'</span>, <span class="string">'uso_high'</span>, <span class="string">'uso_low'</span>, <span class="string">'uso_open'</span>]</div><div class="line">data[<span class="string">'dayofweek'</span>] = data.index.dayofweek</div><div class="line">data[<span class="string">'crude_oil_stock'</span>] = data[<span class="string">'crude_oil_stock'</span>].shift(<span class="number">-2</span>)</div><div class="line">data = data.dropna()</div><div class="line"></div><div class="line">data_daily = &#123;&#125;</div><div class="line"><span class="keyword">for</span> dayofweek <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">5</span>):</div><div class="line">    data_daily[dayofweek] = data[data.index.dayofweek == dayofweek]</div><div class="line">    data_daily[dayofweek][<span class="string">'uso_intraday_return'</span>] = (data_daily[dayofweek][<span class="string">'uso_close'</span>] - data_daily[dayofweek][<span class="string">'uso_open'</span>]) / data_daily[dayofweek][<span class="string">'uso_open'</span>]</div><div class="line">    data_daily[dayofweek][<span class="string">'crude_oil_stock_pct'</span>] = data_daily[dayofweek][<span class="string">'crude_oil_stock'</span>].pct_change()</div><div class="line">    data_daily[dayofweek][<span class="string">'crude_oil_stock_diff'</span>] = data_daily[dayofweek][<span class="string">'crude_oil_stock'</span>].diff()</div><div class="line">    data_daily[dayofweek] = data_daily[dayofweek].dropna()</div></pre></td></tr></table></figure>
 <p>We have all the fields that we need for our analysis. They should be pretty self explanatory.</p>
-<h1 id="analysis">Analysis</h1>
-<p>First we do scatter plots of <code>crude_oil_stock_pct</code>, the percent change of this week’s crude inventory stock on last week’s inventory stock, on <code>uso_intraday_return</code>, the intraday return. Turns out not much of a relationship exists:</p>
+<h1 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h1><p>First we do scatter plots of <code>crude_oil_stock_pct</code>, the percent change of this week’s crude inventory stock on last week’s inventory stock, on <code>uso_intraday_return</code>, the intraday return. Turns out not much of a relationship exists:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> dayofweek <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">5</span>):</div><div class="line">    data_daily[dayofweek].plot(kind=<span class="string">'scatter'</span>, x=<span class="string">'crude_oil_stock_pct'</span>, y=<span class="string">'uso_intraday_return'</span>)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_1.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_2.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_3.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<div class="figure">
-<img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_4.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_0.svg" alt="svg"></p>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_1.svg" alt="svg"></p>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_2.svg" alt="svg"></p>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_3.svg" alt="svg"></p>
+<p><img src="/images/Crude-Oil-Inventory-and-Intraday-Oil-Price-Movements/output_13_4.svg" alt="svg"></p>
 <p>When I ran OLS regressions on each of them, not only are the R-squared pathetic, the slopes are in entirely wrong direction as well. For example, the slope for Wednesdays is 0.734359432686, which means that oil prices tend to increase intraday when the inventory increases.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> dayofweek <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">5</span>):</div><div class="line">    model = sm.ols(formula=<span class="string">'uso_intraday_return ~ crude_oil_stock_pct'</span>, data=data_daily[dayofweek])</div><div class="line">    results = model.fit()</div><div class="line">    print(<span class="string">'Day Of Week '</span> + str(dayofweek))</div><div class="line">    print(<span class="string">'Slope '</span> + str(results.params.crude_oil_stock_pct))</div></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Day Of Week 0</div><div class="line">Slope 0.0959621772799</div><div class="line">Day Of Week 1</div><div class="line">Slope -0.202762367053</div><div class="line">Day Of Week 2</div><div class="line">Slope 0.734359432686</div><div class="line">Day Of Week 3</div><div class="line">Slope 0.482402080895</div><div class="line">Day Of Week 4</div><div class="line">Slope 0.179556901751</div></pre></td></tr></table></figure>
@@ -268,9 +242,8 @@ Kurtosis:                       7.033   Cond. No.                         258.
 ==============================================================================
 
 Warnings:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
-<h1 id="conclusion">Conclusion</h1>
-<p>EIA inventory data is probably a weak predictor in and of itself. We can add more factors (momentum, etc) but the correlation’s definitely not as clear cut as most news agencies would like to claim.</p>
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</code></pre><h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>EIA inventory data is probably a weak predictor in and of itself. We can add more factors (momentum, etc) but the correlation’s definitely not as clear cut as most news agencies would like to claim.</p>
 
       
     </div>

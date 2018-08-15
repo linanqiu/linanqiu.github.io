@@ -73,7 +73,7 @@
   <div class="article-content">
     <div class="entry">
       
-        <p>Word embedding (very bad explanation follows) is translating each word in a corpus into a D dimension vector. These vectors are supposed to preserve semantic properties and are commonly used in NLP. For example, in a large corpus of words (say the google news corpus), the vector point for man <span class="math inline">\(v\_{king}\)</span> should be near the vector point for <span class="math inline">\(v\_{queen}\)</span>. Furthermore, meaning such as “king is to man as queen is to woman” is preserved via <span class="math inline">\(v\_{king} - v\_{queen} \approx v\_{man} - v\_{queen}\)</span>. These embeddings are generated via neural networks and a common tool for doing this is Word2Vec produced by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf" target="_blank" rel="external">Mikolov et al</a>. A fast implementation of Word2Vec is available in gensim.</p>
+        <p>Word embedding (very bad explanation follows) is translating each word in a corpus into a D dimension vector. These vectors are supposed to preserve semantic properties and are commonly used in NLP. For example, in a large corpus of words (say the google news corpus), the vector point for man $v_{king}$ should be near the vector point for $v_{queen}$. Furthermore, meaning such as “king is to man as queen is to woman” is preserved via $v_{king} - v_{queen} \approx v_{man} - v_{queen}$. These embeddings are generated via neural networks and a common tool for doing this is Word2Vec produced by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf" target="_blank" rel="external">Mikolov et al</a>. A fast implementation of Word2Vec is available in gensim.</p>
 <p>For more reading, read <a href="https://www.wikiwand.com/en/Word2vec" target="_blank" rel="external">the wiki</a> or the paper itself. For interesting experiments, read these:</p>
 <ul>
 <li><a href="http://instagram-engineering.tumblr.com/post/117889701472/emojineering-part-1-machine-learning-for-emoji" target="_blank" rel="external">Running Word2Vec on Instagram Emojis</a></li>
@@ -81,12 +81,11 @@
 <li>And, shamelessly, my favorite because I wrote it <a href="https://github.com/linanqiu/word2vec-sentiments" target="_blank" rel="external">Sentiment Analysis using Word2Vec</a></li>
 </ul>
 <p>Won’t it be fun to run this on Piazza posts? I’m a TA for data structures this semester (for Prof Blaer and Prof Bauer) and we have a Piazza containing 800 posts (ripe with answers, followups, etc). Speaking of that, we have an average response time of 5min. Find me another team of TAs that can beat this hurhhurh.</p>
-<h1 id="creating-corpus">Creating Corpus</h1>
-<p>Turns out Piazza does not have an official API. However, there is an unofficial API. <a href="https://github.com/hfaran/piazza-api" class="uri" target="_blank" rel="external">https://github.com/hfaran/piazza-api</a> That’s good enough for us.</p>
+<h1 id="Creating-Corpus"><a href="#Creating-Corpus" class="headerlink" title="Creating Corpus"></a>Creating Corpus</h1><p>Turns out Piazza does not have an official API. However, there is an unofficial API. <a href="https://github.com/hfaran/piazza-api" target="_blank" rel="external">https://github.com/hfaran/piazza-api</a> That’s good enough for us.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> piazza_api <span class="keyword">import</span> Piazza</div><div class="line">piazza = Piazza()</div><div class="line">piazza.user_login()</div></pre></td></tr></table></figure>
 <pre><code>Email: lq2137@columbia.edu
-········</code></pre>
-<p>Now let’s grab all the posts as <code>.json</code>s.</p>
+········
+</code></pre><p>Now let’s grab all the posts as <code>.json</code>s.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> json</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">course = piazza.network(<span class="string">'ijfyurrye2g1oc'</span>)</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">posts = course.iter_all_posts()</div><div class="line"></div><div class="line">count = <span class="number">0</span></div><div class="line"><span class="keyword">for</span> post <span class="keyword">in</span> posts:</div><div class="line">    <span class="keyword">if</span> count % <span class="number">100</span> == <span class="number">0</span>:</div><div class="line">        <span class="keyword">print</span> <span class="string">'Downloading post %d'</span> % count</div><div class="line">    <span class="keyword">with</span> open(<span class="string">'%d.json'</span> % count, <span class="string">'w'</span>) <span class="keyword">as</span> csv_file:</div><div class="line">        csv_file.write(json.dumps(post))</div><div class="line">    count += <span class="number">1</span></div></pre></td></tr></table></figure>
@@ -98,102 +97,97 @@ Downloading post 400
 Downloading post 500
 Downloading post 600
 Downloading post 700
-Downloading post 800</code></pre>
-<p>Then we parse the <code>.json</code>s into a giant <code>.txt</code> by unscrambling the messy <code>.json</code> that the API provides. We also tokenize and perform some basic cleaning (mash everything to lower case). This is a very blunt tool, but should suffice for now.</p>
+Downloading post 800
+</code></pre><p>Then we parse the <code>.json</code>s into a giant <code>.txt</code> by unscrambling the messy <code>.json</code> that the API provides. We also tokenize and perform some basic cleaning (mash everything to lower case). This is a very blunt tool, but should suffice for now.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> glob</div><div class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</div><div class="line"><span class="keyword">from</span> nltk <span class="keyword">import</span> word_tokenize</div></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">grab_children</span><span class="params">(post)</span>:</span></div><div class="line">    content_children = []</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">traverse</span><span class="params">(children)</span>:</span></div><div class="line">        <span class="keyword">for</span> child <span class="keyword">in</span> children:</div><div class="line">            <span class="keyword">if</span> <span class="string">'history'</span> <span class="keyword">in</span> child:</div><div class="line">                history = child[<span class="string">'history'</span>]</div><div class="line">                content_children.extend([history_item[<span class="string">'content'</span>] <span class="keyword">for</span> history_item <span class="keyword">in</span> history])</div><div class="line">            <span class="keyword">if</span> <span class="string">'children'</span> <span class="keyword">in</span> child:</div><div class="line">                traverse(child[<span class="string">'children'</span>])</div><div class="line">    traverse(post[<span class="string">'children'</span>])</div><div class="line">    <span class="keyword">return</span> content_children</div><div class="line"></div><div class="line">corpus = []</div><div class="line"></div><div class="line"><span class="keyword">for</span> glob_file <span class="keyword">in</span> glob.glob(<span class="string">'*.json'</span>):</div><div class="line">    <span class="keyword">with</span> open(glob_file, <span class="string">'r'</span>) <span class="keyword">as</span> json_file:</div><div class="line">        post = json.load(json_file)</div><div class="line">        content = [history[<span class="string">'content'</span>] <span class="keyword">for</span> history <span class="keyword">in</span> post[<span class="string">'history'</span>]]</div><div class="line">        content.extend(grab_children(post))</div><div class="line">        content = [BeautifulSoup(text, <span class="string">'html.parser'</span>).get_text() <span class="keyword">for</span> text <span class="keyword">in</span> content]</div><div class="line">        content = [word_tokenize(text.lower()) <span class="keyword">for</span> text <span class="keyword">in</span> content]</div><div class="line">        corpus.extend(content)</div><div class="line"></div><div class="line"><span class="keyword">with</span> open(<span class="string">'corpus.txt'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> corpus_file:</div><div class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> corpus:</div><div class="line">        corpus_file.write(<span class="string">'%s\n'</span> % <span class="string">' '</span>.join(line).strip().encode(<span class="string">'utf-8'</span>))</div></pre></td></tr></table></figure>
-<h1 id="training-the-model">Training the Model</h1>
-<p>Now let’s train the model using <code>gensim</code></p>
+<h1 id="Training-the-Model"><a href="#Training-the-Model" class="headerlink" title="Training the Model"></a>Training the Model</h1><p>Now let’s train the model using <code>gensim</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> gensim.models.word2vec <span class="keyword">as</span> word2vec</div></pre></td></tr></table></figure>
 <p>Turns out <code>gensim</code> has a nice reader that iterates over a text file with one sentence a line. That’s exactly what we produced in the corpus section.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sentences = word2vec.LineSentence(<span class="string">'corpus.txt'</span>)</div></pre></td></tr></table></figure>
 <p>Now let’s train the model on this corpus. These are some hyperparameters that I found to be good. I shan’t explain them too much, but if you want a little more detail we are essentially using the Skip-Gram with Negative Sampling portion of Word2Vec over 100 iterations and a Skip-Gram window of 15. We also discard all words that occur few than 5 times.</p>
 <p>This should take no more than a minute since the corpus is tiny (which theoretically should give us crappy results but let’s see.)</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model = word2vec.Word2Vec(sentences, min_count=<span class="number">5</span>, workers=<span class="number">8</span>, iter=<span class="number">100</span>, window=<span class="number">15</span>, size=<span class="number">300</span>, negative=<span class="number">25</span>)</div></pre></td></tr></table></figure>
-<h1 id="results">Results</h1>
-<p>Now let’s look at some results.</p>
+<h1 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h1><p>Now let’s look at some results. </p>
 <p>The <code>most_similar</code> method takes in a word, converts it to its vector representation, and finds the other words that are closest to it by cosine distance. These similar words should have been used in a similar context with the original word. Let’s find some interesting results.</p>
 <p>First, let’s do a sanity check using the word <code>homework</code>. Turns out <code>homework</code> is indeed associated with words we’d expect to be associated with <code>homework</code>: <code>solutions</code>, <code>grade</code>, <code>email</code>, and even <code>latex</code>. That’s good.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'homework'</span>)</div></pre></td></tr></table></figure>
-<pre><code>[(u&#39;solutions&#39;, 0.3142701983451843),
- (u&#39;grade&#39;, 0.3114492893218994),
- (u&#39;email&#39;, 0.3077431321144104),
- (u&#39;inserted&#39;, 0.3056461215019226),
- (u&#39;description&#39;, 0.2953464388847351),
- (u&#39;programming&#39;, 0.2912822961807251),
- (u&#39;latex&#39;, 0.2862958312034607),
- (u&#39;theorem&#39;, 0.28351300954818726),
- (u&#39;signature&#39;, 0.2821905314922333),
- (u&#39;posts&#39;, 0.28168296813964844)]</code></pre>
-<p>Now for something more advanced. Let’s try the word <code>heap</code>. Turns out we have words that are pretty related to the <code>heap</code> concept:</p>
+<pre><code>[(u&apos;solutions&apos;, 0.3142701983451843),
+ (u&apos;grade&apos;, 0.3114492893218994),
+ (u&apos;email&apos;, 0.3077431321144104),
+ (u&apos;inserted&apos;, 0.3056461215019226),
+ (u&apos;description&apos;, 0.2953464388847351),
+ (u&apos;programming&apos;, 0.2912822961807251),
+ (u&apos;latex&apos;, 0.2862958312034607),
+ (u&apos;theorem&apos;, 0.28351300954818726),
+ (u&apos;signature&apos;, 0.2821905314922333),
+ (u&apos;posts&apos;, 0.28168296813964844)]
+</code></pre><p>Now for something more advanced. Let’s try the word <code>heap</code>. Turns out we have words that are pretty related to the <code>heap</code> concept:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'heap'</span>)</div></pre></td></tr></table></figure>
-<pre><code>[(u&#39;build&#39;, 0.30242919921875),
- (u&#39;percolatedown&#39;, 0.2909688353538513),
- (u&#39;one-by-one&#39;, 0.28867167234420776),
- (u&#39;deletion&#39;, 0.2867096960544586),
- (u&#39;k&#39;, 0.28530699014663696),
- (u&#39;discussed&#39;, 0.2748313546180725),
- (u&#39;linear&#39;, 0.26605361700057983),
- (u&#39;increasing&#39;, 0.2620879113674164),
- (u&#39;quicksort&#39;, 0.25420695543289185),
- (u&#39;instructions&#39;, 0.2464582324028015)]</code></pre>
-<p>Now for the most awesome result ever. What concepts are associated with <code>good</code>? Turns out I’m one of them.</p>
+<pre><code>[(u&apos;build&apos;, 0.30242919921875),
+ (u&apos;percolatedown&apos;, 0.2909688353538513),
+ (u&apos;one-by-one&apos;, 0.28867167234420776),
+ (u&apos;deletion&apos;, 0.2867096960544586),
+ (u&apos;k&apos;, 0.28530699014663696),
+ (u&apos;discussed&apos;, 0.2748313546180725),
+ (u&apos;linear&apos;, 0.26605361700057983),
+ (u&apos;increasing&apos;, 0.2620879113674164),
+ (u&apos;quicksort&apos;, 0.25420695543289185),
+ (u&apos;instructions&apos;, 0.2464582324028015)]
+</code></pre><p>Now for the most awesome result ever. What concepts are associated with <code>good</code>? Turns out I’m one of them.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'good'</span>)</div></pre></td></tr></table></figure>
-<pre><code>[(u&#39;great&#39;, 0.35192880034446716),
- (u&#39;very&#39;, 0.3159177303314209),
- (u&#39;almost&#39;, 0.30515187978744507),
- (u&#39;concepts&#39;, 0.3004434108734131),
- (u&#39;linan&#39;, 0.2995752990245819),
- (u&#39;too&#39;, 0.2964840829372406),
- (u&#39;basic&#39;, 0.2916448712348938),
- (u&#39;fit&#39;, 0.28502458333969116),
- (u&#39;useful&#39;, 0.2824944257736206),
- (u&#39;answered&#39;, 0.28173112869262695)]</code></pre>
-<div class="figure">
-<img src="https://cdn.thinglink.me/api/image/727110550026190849/1240/10/scaletowidth" alt="doge">
-<p class="caption">doge</p>
-</div>
+<pre><code>[(u&apos;great&apos;, 0.35192880034446716),
+ (u&apos;very&apos;, 0.3159177303314209),
+ (u&apos;almost&apos;, 0.30515187978744507),
+ (u&apos;concepts&apos;, 0.3004434108734131),
+ (u&apos;linan&apos;, 0.2995752990245819),
+ (u&apos;too&apos;, 0.2964840829372406),
+ (u&apos;basic&apos;, 0.2916448712348938),
+ (u&apos;fit&apos;, 0.28502458333969116),
+ (u&apos;useful&apos;, 0.2824944257736206),
+ (u&apos;answered&apos;, 0.28173112869262695)]
+</code></pre><p><img src="https://cdn.thinglink.me/api/image/727110550026190849/1240/10/scaletowidth" alt="doge"></p>
 <p>Let’s see what’s similar to the profs. Turns out Prof Blaer’s love for <code>ocaml</code> is well noted.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'blaer'</span>)</div></pre></td></tr></table></figure>
-<pre><code>[(u&#39;professor&#39;, 0.7219115495681763),
- (u&#39;prof.&#39;, 0.6643839478492737),
- (u&#39;bauer&#39;, 0.4823228120803833),
- (u&#39;today&#39;, 0.44543683528900146),
- (u&#39;went&#39;, 0.4129117727279663),
- (u&#39;pm&#39;, 0.4097597897052765),
- (u&#39;session&#39;, 0.40625864267349243),
- (u&#39;mentioned&#39;, 0.4010222554206848),
- (u&#39;ocaml&#39;, 0.3884058892726898),
- (u&#39;tonight&#39;, 0.38226139545440674)]</code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'bauer'</span>)</div></pre></td></tr></table></figure>
-<pre><code>[(u&#39;professor&#39;, 0.6429691314697266),
- (u&#39;slides&#39;, 0.5277301669120789),
- (u&#39;prof.&#39;, 0.5086715221405029),
- (u&#39;lecture&#39;, 0.4928019642829895),
- (u&#39;blaer&#39;, 0.4823228120803833),
- (u&#39;sign&#39;, 0.4362599849700928),
- (u&#39;pm&#39;, 0.3718754053115845),
- (u&#39;went&#39;, 0.3549380302429199),
- (u&#39;tonight&#39;, 0.326946496963501),
- (u&#39;perform&#39;, 0.3159770965576172)]</code></pre>
-<p>Sasha loves grades, which is unsurprising.</p>
+<pre><code>[(u&apos;professor&apos;, 0.7219115495681763),
+ (u&apos;prof.&apos;, 0.6643839478492737),
+ (u&apos;bauer&apos;, 0.4823228120803833),
+ (u&apos;today&apos;, 0.44543683528900146),
+ (u&apos;went&apos;, 0.4129117727279663),
+ (u&apos;pm&apos;, 0.4097597897052765),
+ (u&apos;session&apos;, 0.40625864267349243),
+ (u&apos;mentioned&apos;, 0.4010222554206848),
+ (u&apos;ocaml&apos;, 0.3884058892726898),
+ (u&apos;tonight&apos;, 0.38226139545440674)]
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'bauer'</span>)</div></pre></td></tr></table></figure>
+<pre><code>[(u&apos;professor&apos;, 0.6429691314697266),
+ (u&apos;slides&apos;, 0.5277301669120789),
+ (u&apos;prof.&apos;, 0.5086715221405029),
+ (u&apos;lecture&apos;, 0.4928019642829895),
+ (u&apos;blaer&apos;, 0.4823228120803833),
+ (u&apos;sign&apos;, 0.4362599849700928),
+ (u&apos;pm&apos;, 0.3718754053115845),
+ (u&apos;went&apos;, 0.3549380302429199),
+ (u&apos;tonight&apos;, 0.326946496963501),
+ (u&apos;perform&apos;, 0.3159770965576172)]
+</code></pre><p>Sasha loves grades, which is unsurprising.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.most_similar(<span class="string">'sasha'</span>)</div></pre></td></tr></table></figure>
-<pre><code>[(u&#39;email&#39;, 0.5593311786651611),
- (u&#39;ta&#39;, 0.4426960051059723),
- (u&#39;monday&#39;, 0.4238441586494446),
- (u&#39;grade&#39;, 0.42380213737487793),
- (u&#39;talk&#39;, 0.40258437395095825),
- (u&#39;grading&#39;, 0.3625785708427429),
- (u&#39;mentioned&#39;, 0.3540249466896057),
- (u&#39;approaches&#39;, 0.3509276807308197),
- (u&#39;cs&#39;, 0.3439938724040985),
- (u&#39;hope&#39;, 0.3431258201599121)]</code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.doesnt_match(<span class="string">"bauer blaer graph"</span>.split())</div></pre></td></tr></table></figure>
-<pre><code>&#39;graph&#39;</code></pre>
-<p>And of course it differentiates between a TA and a professor.</p>
+<pre><code>[(u&apos;email&apos;, 0.5593311786651611),
+ (u&apos;ta&apos;, 0.4426960051059723),
+ (u&apos;monday&apos;, 0.4238441586494446),
+ (u&apos;grade&apos;, 0.42380213737487793),
+ (u&apos;talk&apos;, 0.40258437395095825),
+ (u&apos;grading&apos;, 0.3625785708427429),
+ (u&apos;mentioned&apos;, 0.3540249466896057),
+ (u&apos;approaches&apos;, 0.3509276807308197),
+ (u&apos;cs&apos;, 0.3439938724040985),
+ (u&apos;hope&apos;, 0.3431258201599121)]
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.doesnt_match(<span class="string">"bauer blaer graph"</span>.split())</div></pre></td></tr></table></figure>
+<pre><code>&apos;graph&apos;
+</code></pre><p>And of course it differentiates between a TA and a professor.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">model.doesnt_match(<span class="string">"bauer blaer linan"</span>.split())</div></pre></td></tr></table></figure>
-<pre><code>&#39;linan&#39;</code></pre>
-<p>ISN’T THIS FUCKING AWESOME.</p>
+<pre><code>&apos;linan&apos;
+</code></pre><p>ISN’T THIS FUCKING AWESOME.</p>
 
       
     </div>

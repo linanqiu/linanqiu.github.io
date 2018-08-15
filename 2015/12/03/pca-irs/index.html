@@ -76,26 +76,20 @@
         <blockquote>
 <p>In partial satisfaction of the project requirement for the class Statistical Methods in Finance <code>STAT W4290</code> Fall 2015.</p>
 </blockquote>
-<h1 id="abstract">Abstract</h1>
-<p>This project applies Principal Component Analysis (PCA) to interest rate swaps and shows that the first 3 principal components correspond to yields, slope, and curvature respectively. I first start with vanilla interest rate swaps, and explain how an analysis based purely on single trades are unsatisfactory. I then shift our analysis to curve trades done using pairs of interest rate swaps and show how that is more useful in modeling different parts of the yield curve. I then demonstrate how the principal components from the analysis corresponding to yield, slope and curvature.</p>
-<h1 id="introduction">Introduction</h1>
-<h2 id="what-are-interest-rate-swaps">What are Interest Rate Swaps</h2>
-<blockquote>
+<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>This project applies Principal Component Analysis (PCA) to interest rate swaps and shows that the first 3 principal components correspond to yields, slope, and curvature respectively. I first start with vanilla interest rate swaps, and explain how an analysis based purely on single trades are unsatisfactory. I then shift our analysis to curve trades done using pairs of interest rate swaps and show how that is more useful in modeling different parts of the yield curve. I then demonstrate how the principal components from the analysis corresponding to yield, slope and curvature.</p>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><h2 id="What-are-Interest-Rate-Swaps"><a href="#What-are-Interest-Rate-Swaps" class="headerlink" title="What are Interest Rate Swaps"></a>What are Interest Rate Swaps</h2><blockquote>
 <p>A swap is an over-the-counter agreement between two companies to exchange cash flows in the future. The agreement defines the dates when the cash flows are to be paid and the way in which they are to be calculated. Usually, the calculation of the cash flows involve the future value of an interest rate, an exchange rate, or other market variable. … The most common type of swap is a “plain vanilla” interest rate swap. In this swap a company agrees to pay cash flows equal to interest at a predetermined fixed rate on a notional principal for a predetermined number of years. In return, it receives interest at a floating rate on the same notional principal for the same period of time. - Hull, Chapter 7</p>
 </blockquote>
-<h2 id="mechanics-of-interest-rate-swaps">Mechanics of Interest Rate Swaps</h2>
-<p>In other words, an interest rate swap (IRS) is an <strong>exchange</strong> of</p>
+<h2 id="Mechanics-of-Interest-Rate-Swaps"><a href="#Mechanics-of-Interest-Rate-Swaps" class="headerlink" title="Mechanics of Interest Rate Swaps"></a>Mechanics of Interest Rate Swaps</h2><p>In other words, an interest rate swap (IRS) is an <strong>exchange</strong> of</p>
 <ul>
 <li><strong>Floating Leg</strong>: a series of coupons paid out at predetermined intervals based on the prevailing interest rate at the beginning of those intervals</li>
 <li><strong>Fixed Leg</strong>: a series of fixed amount coupons paid out at predetermined intervals</li>
 </ul>
 <p>Hence, it is a swap of a fixed payment and a floating payment flow. The floating leg and the fixed leg coupons are paid as a percent of a notional amount.</p>
-<p>Consider a 5 year interest rate swap initiated on Jan 1 2012 between Google and Baidu. Let’s say that Google prefers a fixed payment. Then, Google will pay 5% on a notional of $1M every 6 months for 5 years. In return, Baidu pays Google the 6-month LIBOR rate on the same principal taken at the start of every 6 months for that 6 months. Hence, on Jan 1 2012, if the 6-month LIBOR rate is 2%, Baidu will pay Google $2000 / 2 = $1000 (since interest rate is annual. We assume away compounding complications for now) for that 6 months. This payment occurs at Jul 1 2012. On Jul 1 2012, if the 6-month LIBOR rate goes to 7%, Baidu will pay Google $7000 / 2 = $3500 on Jan 1 2013. For those 2 periods, Google always pays Baidu $2500 per period.</p>
+<p>Consider a 5 year interest rate swap initiated on Jan 1 2012 between Google and Baidu. Let’s say that Google prefers a fixed payment. Then, Google will pay 5% on a notional of \$1M every 6 months for 5 years. In return, Baidu pays Google the 6-month LIBOR rate on the same principal taken at the start of every 6 months for that 6 months. Hence, on Jan 1 2012, if the 6-month LIBOR rate is 2%, Baidu will pay Google \$2000 / 2 = \$1000 (since interest rate is annual. We assume away compounding complications for now) for that 6 months. This payment occurs at Jul 1 2012. On Jul 1 2012, if the 6-month LIBOR rate goes to 7%, Baidu will pay Google \$7000 / 2 = \$3500 on Jan 1 2013. For those 2 periods, Google always pays Baidu \$2500 per period.</p>
 <p>In real markets, companies rarely negotiate such contracts on their own. Instead, they negotiate with a financial intermediary who charges a spread between the parties. The average of the fixed rates charged to either party is known as the <em>swap rate</em>.</p>
-<h2 id="libor-and-usd-interest-rate">LIBOR and USD Interest Rate</h2>
-<p>The LIBOR is used as the reference rate for the floating legs in interest rate swaps. LIBOR is the rate that AA rated banks borrow from each other. Over different periods (ranging from say spot to 12 months) the USD LIBOR forward curve is usually above the Treasury Yield curve with mostly the same shape. Hence, the LIBOR forward curve is often used by speculators to speculate on the underlying treasury yield curve (or the ECB rate curve if EUR denominated IRS are used instead).</p>
-<h2 id="interest-rate-swap-yield-rates-and-speculation">Interest Rate Swap Yield Rates and Speculation</h2>
-<p>How IRS can be used for interest rate speculation is straightforward. Say that I am “paying fixed” (hence receiving the floating leg) for a 5 year IRS, colloquially termed a “5y”, that exchanges payments every 6 months. Then, I am essentially betting on the spot 6 month rate, forward 6 month rate in 6 months, forward 6 month rate in 1 year … and the forward 6 month rate in 4.5 years for each of the floating leg payments. If each of those rates go up, I am profitting since I am paying a lower amount (via the fixed rate I locked in). My counterparty would be losing since he’s paying a larger amount than he originally though.</p>
+<h2 id="LIBOR-and-USD-Interest-Rate"><a href="#LIBOR-and-USD-Interest-Rate" class="headerlink" title="LIBOR and USD Interest Rate"></a>LIBOR and USD Interest Rate</h2><p>The LIBOR is used as the reference rate for the floating legs in interest rate swaps. LIBOR is the rate that AA rated banks borrow from each other. Over different periods (ranging from say spot to 12 months) the USD LIBOR forward curve is usually above the Treasury Yield curve with mostly the same shape. Hence, the LIBOR forward curve is often used by speculators to speculate on the underlying treasury yield curve (or the ECB rate curve if EUR denominated IRS are used instead).</p>
+<h2 id="Interest-Rate-Swap-Yield-Rates-and-Speculation"><a href="#Interest-Rate-Swap-Yield-Rates-and-Speculation" class="headerlink" title="Interest Rate Swap Yield Rates and Speculation"></a>Interest Rate Swap Yield Rates and Speculation</h2><p>How IRS can be used for interest rate speculation is straightforward. Say that I am “paying fixed” (hence receiving the floating leg) for a 5 year IRS, colloquially termed a “5y”, that exchanges payments every 6 months. Then, I am essentially betting on the spot 6 month rate, forward 6 month rate in 6 months, forward 6 month rate in 1 year … and the forward 6 month rate in 4.5 years for each of the floating leg payments. If each of those rates go up, I am profitting since I am paying a lower amount (via the fixed rate I locked in). My counterparty would be losing since he’s paying a larger amount than he originally though.</p>
 <p>Then, the IRS swap rate can be viewered as the “yield to maturity” of the fixed leg that makes the present value of the entire swap 0, given the forward rates estimated for the floating leg. Or, in other words, the swap rate is the discount rate that makes the present value of the fixed leg equal to the present value of the floating leg when the flaoting leg is discounted by each of the forward rates.</p>
 <p>Hence, an IRS is an instrument to bet on the entire forward curve from spot rate to the year of maturity. A “5y” allows us to bet on the entire curve up to the 5 year point.</p>
 <p>In terms of directions:</p>
@@ -103,23 +97,20 @@
 <li>If I pay fixed (receive float), when the yield curve goes up, I profit (since I’m paying less than I would have).</li>
 <li>If I receive fixed (pay float), when the yield curve goes up, I lose (since I’m paying more).</li>
 </ul>
-<h3 id="curve-trades">Curve Trades</h3>
-<p>Then, one can imagine a trade where:</p>
+<h3 id="Curve-Trades"><a href="#Curve-Trades" class="headerlink" title="Curve Trades"></a>Curve Trades</h3><p>Then, one can imagine a trade where:</p>
 <ul>
 <li>I pay fixed (receive float) on one 2 year IRS: I profit from the yield curve going up at the short end</li>
 <li>I pay float (receive fixed) on one 10 year IRS: I profit from the yield curve going down at the long end</li>
 </ul>
 <p>What am I doing here? The fixed payments from now to year 2 cancel each other out, just as the floating payments. Hence, I am betting on the curve from year 2 to year 10. In other words, I am betting on a specific section of the curve, not just from today till the end of the curve. In particular, I am betting that the section of the curve <em>flattens</em> (going up at the short end and going down at the long end). There’s an important caveat to this: <strong>I do not hold this trade to maturity.</strong> Otherwise, this would cease to be a curve trade. The 2 year would expire and I would be left with one outstanding swap, making this a normal directional bet.</p>
-<h3 id="butterfly-trades">Butterfly Trades</h3>
-<p>Butterfly trades benefit from differing movements in 3 instruments. Imagine this trade:</p>
+<h3 id="Butterfly-Trades"><a href="#Butterfly-Trades" class="headerlink" title="Butterfly Trades"></a>Butterfly Trades</h3><p>Butterfly trades benefit from differing movements in 3 instruments. Imagine this trade:</p>
 <ul>
 <li>I pay fixed (receive float) on 2 year IRS: I profit from yield curve going up at the short end</li>
 <li>I receive float (pay fixed) on 10 year IRS: I profit from the yield curve going down at the middle end</li>
 <li>I pay fixed (receive float) on 30 year IRS: I profit from the yield curve going up at the long end</li>
 </ul>
 <p>I essentially betting on the curvature of the curve. An imaginative trader gave this trade the name, presumably because of the symmetric direction.</p>
-<h1 id="pca-on-vanilla-irs">PCA on Vanilla IRS</h1>
-<p>We begin by performing PCA on single IRS rates. Here, I try to find the relationships between different IRS maturities. By doing this, I am essentially finding out similar components in movements of the yield curve between</p>
+<h1 id="PCA-on-Vanilla-IRS"><a href="#PCA-on-Vanilla-IRS" class="headerlink" title="PCA on Vanilla IRS"></a>PCA on Vanilla IRS</h1><p>We begin by performing PCA on single IRS rates. Here, I try to find the relationships between different IRS maturities. By doing this, I am essentially finding out similar components in movements of the yield curve between</p>
 <ul>
 <li>Spot to 1 year</li>
 <li>Spot to 2 year</li>
@@ -131,20 +122,15 @@
 <li>Spot to 30 year</li>
 </ul>
 <p>An astute reader would realize that we are including the short end of the curve in all the time series, which is a problem we can solve by using curve trade yields instead in a later section.</p>
-<h2 id="data-collection">Data Collection</h2>
-<p>We collect data for the various time series from the St. Louis FRED using the <code>quantmod</code> package.</p>
+<h2 id="Data-Collection"><a href="#Data-Collection" class="headerlink" title="Data Collection"></a>Data Collection</h2><p>We collect data for the various time series from the St. Louis FRED using the <code>quantmod</code> package.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(quantmod)</div><div class="line"><span class="keyword">library</span>(downloader)</div><div class="line"></div><div class="line">terms = c(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">30</span>)</div><div class="line"><span class="keyword">for</span> (term <span class="keyword">in</span> terms) &#123;</div><div class="line">  getSymbols(paste(<span class="string">'DSWP'</span>, term, sep=<span class="string">''</span>), src=<span class="string">'FRED'</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>Then I select the data for year to date which leaves me with 250 yields over the past year.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">DSWP1 = DSWP1[!is.na(DSWP1)]</div><div class="line">DSWP2 = DSWP2[!is.na(DSWP2)]</div><div class="line">DSWP3 = DSWP3[!is.na(DSWP3)]</div><div class="line">DSWP4 = DSWP4[!is.na(DSWP4)]</div><div class="line">DSWP5 = DSWP5[!is.na(DSWP5)]</div><div class="line">DSWP7 = DSWP7[!is.na(DSWP7)]</div><div class="line">DSWP10 = DSWP10[!is.na(DSWP10)]</div><div class="line">DSWP30 = DSWP30[!is.na(DSWP30)]</div><div class="line"></div><div class="line">rates = cbind(DSWP1, DSWP2, DSWP3, DSWP4, DSWP5, DSWP7, DSWP10, DSWP30)</div><div class="line">rates = last(rates, <span class="number">250</span>)</div></pre></td></tr></table></figure>
 <p>I can plot the yields for the different IRS maturities. Due to the upward sloping nature of the yield curve, yields of IRS with longer maturities are always higher</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(ggplot2)</div><div class="line"><span class="keyword">library</span>(reshape)</div></pre></td></tr></table></figure>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">dataframe = data.frame(index(rates), rates)</div><div class="line">colnames(dataframe) = c(<span class="string">'date'</span>, <span class="string">'y1'</span>, <span class="string">'y2'</span>, <span class="string">'y3'</span>, <span class="string">'y4'</span>, <span class="string">'y5'</span>, <span class="string">'y7'</span>, <span class="string">'y10'</span>, <span class="string">'y30'</span>)</div><div class="line">melted = melt(dataframe, id.vars=<span class="string">'date'</span>)</div><div class="line">plot = ggplot(data=melted, aes(x=date, y=value, color=variable)) + geom_line() + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'IRS Yield Rate'</span>)</div><div class="line">plot</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_12_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<h2 id="results">Results</h2>
-<p>I perform PCA on the time series using the covariance matrix of the various time series.</p>
+<p><img src="/images/pca-irs/output_12_0.svg" alt="svg"></p>
+<h2 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h2><p>I perform PCA on the time series using the covariance matrix of the various time series.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">pcadata = rates</div><div class="line">colnames(pcadata) = c(<span class="string">'y1'</span>, <span class="string">'y2'</span>, <span class="string">'y3'</span>, <span class="string">'y4'</span>, <span class="string">'y5'</span>, <span class="string">'y7'</span>, <span class="string">'y10'</span>, <span class="string">'y30'</span>)</div><div class="line">fit = princomp(pcadata, cor=<span class="literal">FALSE</span>, scores=<span class="literal">TRUE</span>)</div><div class="line">summary(fit)</div></pre></td></tr></table></figure>
 <pre><code>Importance of components:
                           Comp.1    Comp.2     Comp.3      Comp.4       Comp.5
@@ -154,75 +140,25 @@ Cumulative Proportion  0.8500517 0.9552266 0.99697646 0.999585128 0.9997778228
                              Comp.6       Comp.7       Comp.8
 Standard deviation     3.715011e-03 3.106083e-03 2.727945e-03
 Proportion of Variance 9.926388e-05 6.939006e-05 5.352322e-05
-Cumulative Proportion  9.998771e-01 9.999465e-01 1.000000e+00</code></pre>
-<p>First observation would be that the data has a high degree of covariance among the time series. This should not be surprising at all, since the short end of the curve was included in all these measurements.</p>
+Cumulative Proportion  9.998771e-01 9.999465e-01 1.000000e+00
+</code></pre><p>First observation would be that the data has a high degree of covariance among the time series. This should not be surprising at all, since the short end of the curve was included in all these measurements.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">covariance_matrix = cor(pcadata)</div><div class="line"><span class="keyword">require</span>(corrplot)</div><div class="line">corrplot(covariance_matrix, method=<span class="string">'shade'</span>, type=<span class="string">'full'</span>, shade.col=<span class="literal">NA</span>, tl.col=<span class="string">'black'</span>)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_16_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_16_0.svg" alt="svg"></p>
 <p>Correspondingly, I should expect the first few principal components to have a high proportion of explained variance.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(ggbiplot)</div><div class="line">ggbiplot(fit, obs.scale=<span class="number">1</span>, var.scale=<span class="number">1</span>)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_18_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_18_0.svg" alt="svg"></p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ggscreeplot(fit)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_19_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_19_0.svg" alt="svg"></p>
 <p>Indeed, the first principal component accounts for 85.0% of variance, with the second principal component getting 10.5% and the third 4.1%. The first 3 principal components account for, cumulatively, 99.7% of all movements in the data. Hence, in terms of dimensionality reduction, the first 3 principal components are representative of the data.</p>
 <p>We can plot the scores of the first 3 components across time.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">scores = fit$scores</div><div class="line">scores_dataframe = data.frame(index(rates), scores)</div><div class="line">colnames(scores_dataframe) = c(<span class="string">'date'</span>, <span class="string">'pc1'</span>, <span class="string">'pc2'</span>, <span class="string">'pc3'</span>, <span class="string">'pc4'</span>, <span class="string">'pc5'</span>, <span class="string">'pc6'</span>, <span class="string">'pc7'</span>, <span class="string">'pc8'</span>)</div><div class="line">keeps = c(<span class="string">'date'</span>, <span class="string">'pc1'</span>, <span class="string">'pc2'</span>, <span class="string">'pc3'</span>)</div><div class="line">scores_dataframe = scores_dataframe[keeps]</div><div class="line">scores_melted = melt(scores_dataframe, id.vars=<span class="string">'date'</span>)</div><div class="line">plot = ggplot(data=scores_melted, aes(x=as.Date(date), y=value, color=variable)) + geom_line() + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'Principal Component Score'</span>)</div><div class="line">plot</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_21_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<h2 id="interpretation-of-results">Interpretation of Results</h2>
-<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">loadings = with(fit, unclass(loadings))</div><div class="line">loadings</div></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>
-</th>
-<th scope="col">
-Comp.1
-</th>
-<th scope="col">
-Comp.2
-</th>
-<th scope="col">
-Comp.3
-</th>
-<th scope="col">
-Comp.4
-</th>
-<th scope="col">
-Comp.5
-</th>
-<th scope="col">
-Comp.6
-</th>
-<th scope="col">
-Comp.7
-</th>
-<th scope="col">
-Comp.8
-</th>
-</tr>
-</thead>
-<tbody>
-<pre><code>&lt;tr&gt;&lt;th scope=row&gt;y1&lt;/th&gt;&lt;td&gt;-0.05693512&lt;/td&gt;&lt;td&gt;-0.13640484&lt;/td&gt;&lt;td&gt; 0.81073244&lt;/td&gt;&lt;td&gt;-0.16509581&lt;/td&gt;&lt;td&gt;-0.52010662&lt;/td&gt;&lt;td&gt;-0.10535402&lt;/td&gt;&lt;td&gt;-0.10119507&lt;/td&gt;&lt;td&gt;-0.04192361&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y2&lt;/th&gt;&lt;td&gt;-0.16669185&lt;/td&gt;&lt;td&gt;-0.34625166&lt;/td&gt;&lt;td&gt; 0.43078043&lt;/td&gt;&lt;td&gt; 0.03625115&lt;/td&gt;&lt;td&gt; 0.62509086&lt;/td&gt;&lt;td&gt; 0.43345259&lt;/td&gt;&lt;td&gt; 0.19830580&lt;/td&gt;&lt;td&gt; 0.21792835&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y3&lt;/th&gt;&lt;td&gt;-0.25832243&lt;/td&gt;&lt;td&gt;-0.41911497&lt;/td&gt;&lt;td&gt; 0.02728088&lt;/td&gt;&lt;td&gt; 0.32238835&lt;/td&gt;&lt;td&gt; 0.26957189&lt;/td&gt;&lt;td&gt;-0.50912909&lt;/td&gt;&lt;td&gt;-0.23991017&lt;/td&gt;&lt;td&gt;-0.51331798&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y4&lt;/th&gt;&lt;td&gt;-0.3264334&lt;/td&gt;&lt;td&gt;-0.3807082&lt;/td&gt;&lt;td&gt;-0.1918120&lt;/td&gt;&lt;td&gt; 0.3024259&lt;/td&gt;&lt;td&gt;-0.3000946&lt;/td&gt;&lt;td&gt;-0.2516847&lt;/td&gt;&lt;td&gt; 0.2005263&lt;/td&gt;&lt;td&gt; 0.6531742&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y5&lt;/th&gt;&lt;td&gt;-0.37780952&lt;/td&gt;&lt;td&gt;-0.27733220&lt;/td&gt;&lt;td&gt;-0.24318642&lt;/td&gt;&lt;td&gt; 0.00362353&lt;/td&gt;&lt;td&gt;-0.38673513&lt;/td&gt;&lt;td&gt; 0.55717635&lt;/td&gt;&lt;td&gt; 0.22904952&lt;/td&gt;&lt;td&gt;-0.45685974&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y7&lt;/th&gt;&lt;td&gt;-0.43649941&lt;/td&gt;&lt;td&gt;-0.03879438&lt;/td&gt;&lt;td&gt;-0.15120515&lt;/td&gt;&lt;td&gt;-0.42341285&lt;/td&gt;&lt;td&gt; 0.05459486&lt;/td&gt;&lt;td&gt; 0.13634667&lt;/td&gt;&lt;td&gt;-0.73385353&lt;/td&gt;&lt;td&gt; 0.21379852&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y10&lt;/th&gt;&lt;td&gt;-0.4708117505&lt;/td&gt;&lt;td&gt; 0.2213930338&lt;/td&gt;&lt;td&gt; 0.0007092894&lt;/td&gt;&lt;td&gt;-0.5524750953&lt;/td&gt;&lt;td&gt; 0.1530175357&lt;/td&gt;&lt;td&gt;-0.3715511987&lt;/td&gt;&lt;td&gt; 0.5064115711&lt;/td&gt;&lt;td&gt;-0.0785801970&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;y30&lt;/th&gt;&lt;td&gt;-0.490660311&lt;/td&gt;&lt;td&gt; 0.643019711&lt;/td&gt;&lt;td&gt; 0.193912132&lt;/td&gt;&lt;td&gt; 0.539919671&lt;/td&gt;&lt;td&gt; 0.008108114&lt;/td&gt;&lt;td&gt; 0.106656257&lt;/td&gt;&lt;td&gt;-0.072175546&lt;/td&gt;&lt;td&gt; 0.003512140&lt;/td&gt;&lt;/tr&gt;</code></pre>
-</tbody>
-</table>
+<p><img src="/images/pca-irs/output_21_0.svg" alt="svg"></p>
+<h2 id="Interpretation-of-Results"><a href="#Interpretation-of-Results" class="headerlink" title="Interpretation of Results"></a>Interpretation of Results</h2><figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">loadings = with(fit, unclass(loadings))</div><div class="line">loadings</div></pre></td></tr></table></figure>
+<table><br><thead><tr><th></th><th scope="col">Comp.1</th><th scope="col">Comp.2</th><th scope="col">Comp.3</th><th scope="col">Comp.4</th><th scope="col">Comp.5</th><th scope="col">Comp.6</th><th scope="col">Comp.7</th><th scope="col">Comp.8</th></tr></thead><br><tbody><br>    <tr><th scope="row">y1</th><td>-0.05693512</td><td>-0.13640484</td><td> 0.81073244</td><td>-0.16509581</td><td>-0.52010662</td><td>-0.10535402</td><td>-0.10119507</td><td>-0.04192361</td></tr><br>    <tr><th scope="row">y2</th><td>-0.16669185</td><td>-0.34625166</td><td> 0.43078043</td><td> 0.03625115</td><td> 0.62509086</td><td> 0.43345259</td><td> 0.19830580</td><td> 0.21792835</td></tr><br>    <tr><th scope="row">y3</th><td>-0.25832243</td><td>-0.41911497</td><td> 0.02728088</td><td> 0.32238835</td><td> 0.26957189</td><td>-0.50912909</td><td>-0.23991017</td><td>-0.51331798</td></tr><br>    <tr><th scope="row">y4</th><td>-0.3264334</td><td>-0.3807082</td><td>-0.1918120</td><td> 0.3024259</td><td>-0.3000946</td><td>-0.2516847</td><td> 0.2005263</td><td> 0.6531742</td></tr><br>    <tr><th scope="row">y5</th><td>-0.37780952</td><td>-0.27733220</td><td>-0.24318642</td><td> 0.00362353</td><td>-0.38673513</td><td> 0.55717635</td><td> 0.22904952</td><td>-0.45685974</td></tr><br>    <tr><th scope="row">y7</th><td>-0.43649941</td><td>-0.03879438</td><td>-0.15120515</td><td>-0.42341285</td><td> 0.05459486</td><td> 0.13634667</td><td>-0.73385353</td><td> 0.21379852</td></tr><br>    <tr><th scope="row">y10</th><td>-0.4708117505</td><td> 0.2213930338</td><td> 0.0007092894</td><td>-0.5524750953</td><td> 0.1530175357</td><td>-0.3715511987</td><td> 0.5064115711</td><td>-0.0785801970</td></tr><br>    <tr><th scope="row">y30</th><td>-0.490660311</td><td> 0.643019711</td><td> 0.193912132</td><td> 0.539919671</td><td> 0.008108114</td><td> 0.106656257</td><td>-0.072175546</td><td> 0.003512140</td></tr><br></tbody><br></table>
+
+
+
+
 <p>However, I am also interested in the interpretation of the principal components. I hypothesized that the first 3 principal components should correspond to:</p>
 <ul>
 <li>Principal Component 1: Directional movements in the yield curve. These are movements that shift the entire yield curve up or down.</li>
@@ -236,22 +172,18 @@ Comp.8
 <li>Principal Component 3 (PC3): IRS yields on the short and long ends of the curve are weighted positively while the ones in the middle are weighted negatively. Since the signs are arbitrary, this means that PC3 reflects movements that cause the short and long end to go in one direction, and the middle to go in the other. This is exactly what curvature movements do – if the yield curve increases in curvature, the short and long end goes down while the middle goes up.</li>
 </ul>
 <p>Hence PC1 can be interpreted as directional movements, PC2 as slope movements, and PC3 as curvature movements.</p>
-<h2 id="shortcoming">Shortcoming</h2>
-<p>I find this analysis lacking in one striking way: we are unable to isolate portions of the curve. For example, the time series for y30 includes movements from the spot all the way to year 30. In other words, it includes movements of the y1, y2, y3 etc. In a similar way, the y3 includes movements of y1. Hence, we are unable to isolate movements in the “long end only” and are instead forced to make conclusions about yield rates “from the short end to the long end” or on the “short end” only.</p>
+<h2 id="Shortcoming"><a href="#Shortcoming" class="headerlink" title="Shortcoming"></a>Shortcoming</h2><p>I find this analysis lacking in one striking way: we are unable to isolate portions of the curve. For example, the time series for y30 includes movements from the spot all the way to year 30. In other words, it includes movements of the y1, y2, y3 etc. In a similar way, the y3 includes movements of y1. Hence, we are unable to isolate movements in the “long end only” and are instead forced to make conclusions about yield rates “from the short end to the long end” or on the “short end” only.</p>
 <p>This could be done instead by measuring yields for curve trades. This is what I will do in the next section.</p>
-<h1 id="pca-on-curve-trade-rates">PCA on Curve Trade Rates</h1>
-<h2 id="review-on-curve-trades-and-butterfly-trades">Review on Curve Trades and Butterfly Trades</h2>
-<p>Refer to the introduction for a complete breakdown of curve trades and butterfly trades. As a reminder,</p>
+<h1 id="PCA-on-Curve-Trade-Rates"><a href="#PCA-on-Curve-Trade-Rates" class="headerlink" title="PCA on Curve Trade Rates"></a>PCA on Curve Trade Rates</h1><h2 id="Review-on-Curve-Trades-and-Butterfly-Trades"><a href="#Review-on-Curve-Trades-and-Butterfly-Trades" class="headerlink" title="Review on Curve Trades and Butterfly Trades"></a>Review on Curve Trades and Butterfly Trades</h2><p>Refer to the introduction for a complete breakdown of curve trades and butterfly trades. As a reminder,</p>
 <ul>
 <li>Curve trades are bets on the slope of a specific section of the curve</li>
 <li>Butterflies are bets on the curvature of two specific sections of the curve.</li>
 </ul>
-<h2 id="data-collection-1">Data Collection</h2>
-<p>I employ most of the same data collection methods as in the previous section.</p>
+<h2 id="Data-Collection-1"><a href="#Data-Collection-1" class="headerlink" title="Data Collection"></a>Data Collection</h2><p>I employ most of the same data collection methods as in the previous section.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(quantmod)</div><div class="line"><span class="keyword">library</span>(downloader)</div><div class="line"></div><div class="line">terms = c(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">30</span>)</div><div class="line"><span class="keyword">for</span> (term <span class="keyword">in</span> terms) &#123;</div><div class="line">  getSymbols(paste(<span class="string">'DSWP'</span>, term, sep=<span class="string">''</span>), src=<span class="string">'FRED'</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line">DSWP1 = DSWP1[!is.na(DSWP1)]</div><div class="line">DSWP2 = DSWP2[!is.na(DSWP2)]</div><div class="line">DSWP3 = DSWP3[!is.na(DSWP3)]</div><div class="line">DSWP4 = DSWP4[!is.na(DSWP4)]</div><div class="line">DSWP5 = DSWP5[!is.na(DSWP5)]</div><div class="line">DSWP7 = DSWP7[!is.na(DSWP7)]</div><div class="line">DSWP10 = DSWP10[!is.na(DSWP10)]</div><div class="line">DSWP30 = DSWP30[!is.na(DSWP30)]</div></pre></td></tr></table></figure>
 <p>The yield of a curve trade is calculated as follow:</p>
-<p><span class="math display">\[C = S\_{0, t\_2} - S\_{0, t\_1}\]</span></p>
-<p>where <span class="math inline">\(C\)</span> is the curve trade rate, <span class="math inline">\(S\_{0,t\_2}\)</span> is the swap rate for an IRS of maturity <span class="math inline">\(t\_2\)</span> and <span class="math inline">\(S\_{0, t\_2}\)</span> is the swap rate for an IRS of maturity <span class="math inline">\(t\_1\)</span>. Intuitively, we can think of this the forward rate from <span class="math inline">\(t\_1\)</span> to <span class="math inline">\(t\_2\)</span> and indeed it is. We select the following “tenors” (sections of the yield curve) to represent the whole yield curve. They are quoted as “XsYs” where we pay fix for X years and receive fix for Y years of IRS.</p>
+<p>$$C = S_{0, t_2} - S_{0, t_1}$$</p>
+<p>where $C$ is the curve trade rate, $S_{0,t_2}$ is the swap rate for an IRS of maturity $t_2$ and $S_{0, t_2}$ is the swap rate for an IRS of maturity $t_1$. Intuitively, we can think of this the forward rate from $t_1$ to $t_2$ and indeed it is. We select the following “tenors” (sections of the yield curve) to represent the whole yield curve. They are quoted as “XsYs” where we pay fix for X years and receive fix for Y years of IRS.</p>
 <ul>
 <li>2s1s</li>
 <li>3s1s</li>
@@ -266,12 +198,8 @@ Comp.8
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 2-1, 3-1, 4-1, 5-1, 7-1, 10-2, 10-5, 30-10</span></div><div class="line">curve2_1 = DSWP2 - DSWP1</div><div class="line">curve3_1 = DSWP3 - DSWP1</div><div class="line">curve4_1 = DSWP4 - DSWP1</div><div class="line">curve5_1 = DSWP5 - DSWP1</div><div class="line">curve7_1 = DSWP7 - DSWP1</div><div class="line">curve10_2 = DSWP10 - DSWP2</div><div class="line">curve10_5 = DSWP10 - DSWP5</div><div class="line">curve30_10 = DSWP30 - DSWP10</div><div class="line"></div><div class="line">rates = cbind(curve2_1, curve3_1, curve4_1, curve5_1, curve7_1, curve10_2, curve10_5, curve30_10)</div><div class="line">rates = last(rates, <span class="number">250</span>)</div><div class="line">colnames(rates) = c(<span class="string">'curve2y1y'</span>, <span class="string">'curve3y1y'</span>, <span class="string">'curve4y1y'</span>, <span class="string">'curve5y1y'</span>, <span class="string">'curve7y1y'</span>, <span class="string">'curve10y2y'</span>, <span class="string">'curve10y5y'</span>, <span class="string">'curve30y10y'</span>)</div></pre></td></tr></table></figure>
 <p>As for the vanilla yields, I can plot a time series of the different curve rates. However, this chart isn’t very telling, since I am measuring different ends of the curve.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(ggplot2)</div><div class="line"><span class="keyword">library</span>(reshape)</div><div class="line">dataframe = data.frame(index(rates), rates)</div><div class="line">colnames(dataframe) = c(<span class="string">'date'</span>, <span class="string">'curve2y1y'</span>, <span class="string">'curve3y1y'</span>, <span class="string">'curve4y1y'</span>, <span class="string">'curve5y1y'</span>, <span class="string">'curve7y1y'</span>, <span class="string">'curve10y2y'</span>, <span class="string">'curve10y5y'</span>, <span class="string">'curve30y10y'</span>)</div><div class="line">melted = melt(dataframe, id.vars=<span class="string">'date'</span>)</div><div class="line">plot = ggplot(data=melted, aes(x=as.Date(date), y=value, color=variable)) + geom_line()</div><div class="line">plot</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_31_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<h2 id="results-1">Results</h2>
-<p>I perform PCA on the series as well using the covariance matrix of the time series.</p>
+<p><img src="/images/pca-irs/output_31_0.svg" alt="svg"></p>
+<h2 id="Results-1"><a href="#Results-1" class="headerlink" title="Results"></a>Results</h2><p>I perform PCA on the series as well using the covariance matrix of the time series.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">pcadata = rates</div><div class="line">colnames(pcadata) = c(<span class="string">'curve2y1y'</span>, <span class="string">'curve3y1y'</span>, <span class="string">'curve4y1y'</span>, <span class="string">'curve5y1y'</span>, <span class="string">'curve7y1y'</span>, <span class="string">'curve10y2y'</span>, <span class="string">'curve10y5y'</span>, <span class="string">'curve30y10y'</span>)</div><div class="line">fit = princomp(pcadata, cor=<span class="literal">FALSE</span>, scores=<span class="literal">TRUE</span>)</div><div class="line">summary(fit)</div></pre></td></tr></table></figure>
 <pre><code>Importance of components:
                           Comp.1    Comp.2      Comp.3      Comp.4       Comp.5
@@ -281,75 +209,25 @@ Cumulative Proportion  0.8126072 0.9894639 0.998163497 0.999576529 0.9998230661
                              Comp.6       Comp.7 Comp.8
 Standard deviation     2.971792e-03 2.817212e-03      0
 Proportion of Variance 9.318811e-05 8.374576e-05      0
-Cumulative Proportion  9.999163e-01 1.000000e+00      1</code></pre>
-<p>Again, the series has a high degree of covariance among the time series. This again should not be surprising, since they are all yield rates after all (though of different tenors) hence should be driven by the same macroeconomic factors.</p>
+Cumulative Proportion  9.999163e-01 1.000000e+00      1
+</code></pre><p>Again, the series has a high degree of covariance among the time series. This again should not be surprising, since they are all yield rates after all (though of different tenors) hence should be driven by the same macroeconomic factors.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">covariance_matrix = cor(pcadata)</div><div class="line"><span class="keyword">require</span>(corrplot)</div><div class="line">corrplot(covariance_matrix, method=<span class="string">'shade'</span>, type=<span class="string">'full'</span>, shade.col=<span class="literal">NA</span>, tl.col=<span class="string">'black'</span>)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_35_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_35_0.svg" alt="svg"></p>
 <p>However, what should be interesting to note is that some time series now have somewhat negative covariance with others. These happen to be between the far short end of the curve and the far long end (eg. 2s1s vs 30s10s). This makes sense, since the far end usually doesn’t move as much as the short end, and sometimes in the opposite direction (slope).</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(ggbiplot)</div><div class="line">ggbiplot(fit, obs.scale=<span class="number">1</span>, var.scale=<span class="number">1</span>)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_37_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_37_0.svg" alt="svg"></p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ggscreeplot(fit)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_38_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_38_0.svg" alt="svg"></p>
 <p>The first principal component accounts for 81.3% of variance, with the second principal component getting 17.7% and the third 0.87%. The first 3 principal components account for, cumulatively, 99.8% of all movements in the data. Hence, in terms of dimensionality reduction, the first 3 principal components are representative of the data.</p>
 <p>We can plot the scores of the first 3 components across time.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">scores = fit$scores</div><div class="line">scores_dataframe = data.frame(index(rates), scores)</div><div class="line">colnames(scores_dataframe) = c(<span class="string">'date'</span>, <span class="string">'pc1'</span>, <span class="string">'pc2'</span>, <span class="string">'pc3'</span>, <span class="string">'pc4'</span>, <span class="string">'pc5'</span>, <span class="string">'pc6'</span>, <span class="string">'pc7'</span>, <span class="string">'pc8'</span>)</div><div class="line">keeps = c(<span class="string">'date'</span>, <span class="string">'pc1'</span>, <span class="string">'pc2'</span>, <span class="string">'pc3'</span>)</div><div class="line">scores_dataframe = scores_dataframe[keeps]</div><div class="line">scores_melted = melt(scores_dataframe, id.vars=<span class="string">'date'</span>)</div><div class="line">plot = ggplot(data=scores_melted, aes(x=as.Date(date), y=value, color=variable)) + geom_line() + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'Principal Component Score'</span>)</div><div class="line">plot</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_40_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<h2 id="interpretation-of-results-1">Interpretation of Results</h2>
-<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">loadings = with(fit, unclass(loadings))</div><div class="line">loadings</div></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>
-</th>
-<th scope="col">
-Comp.1
-</th>
-<th scope="col">
-Comp.2
-</th>
-<th scope="col">
-Comp.3
-</th>
-<th scope="col">
-Comp.4
-</th>
-<th scope="col">
-Comp.5
-</th>
-<th scope="col">
-Comp.6
-</th>
-<th scope="col">
-Comp.7
-</th>
-<th scope="col">
-Comp.8
-</th>
-</tr>
-</thead>
-<tbody>
-<pre><code>&lt;tr&gt;&lt;th scope=row&gt;curve2y1y&lt;/th&gt;&lt;td&gt;-0.171227734&lt;/td&gt;&lt;td&gt;-0.195448923&lt;/td&gt;&lt;td&gt; 0.004706401&lt;/td&gt;&lt;td&gt; 0.667761277&lt;/td&gt;&lt;td&gt; 0.255984666&lt;/td&gt;&lt;td&gt;-0.361642751&lt;/td&gt;&lt;td&gt;-0.200598804&lt;/td&gt;&lt;td&gt;-0.500000000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve3y1y&lt;/th&gt;&lt;td&gt;-3.263336e-01&lt;/td&gt;&lt;td&gt;-2.874607e-01&lt;/td&gt;&lt;td&gt; 1.814160e-01&lt;/td&gt;&lt;td&gt; 2.487582e-01&lt;/td&gt;&lt;td&gt;-5.310257e-01&lt;/td&gt;&lt;td&gt; 5.745447e-01&lt;/td&gt;&lt;td&gt;-3.224754e-01&lt;/td&gt;&lt;td&gt; 3.785444e-13&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve4y1y&lt;/th&gt;&lt;td&gt;-4.295687e-01&lt;/td&gt;&lt;td&gt;-2.585274e-01&lt;/td&gt;&lt;td&gt; 2.043599e-01&lt;/td&gt;&lt;td&gt;-1.301226e-01&lt;/td&gt;&lt;td&gt;-4.286356e-01&lt;/td&gt;&lt;td&gt;-4.860891e-01&lt;/td&gt;&lt;td&gt; 5.195463e-01&lt;/td&gt;&lt;td&gt;-6.752862e-13&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve5y1y&lt;/th&gt;&lt;td&gt;-0.49071115&lt;/td&gt;&lt;td&gt;-0.14814235&lt;/td&gt;&lt;td&gt; 0.05408491&lt;/td&gt;&lt;td&gt;-0.21436777&lt;/td&gt;&lt;td&gt; 0.33797228&lt;/td&gt;&lt;td&gt;-0.25143465&lt;/td&gt;&lt;td&gt;-0.51081605&lt;/td&gt;&lt;td&gt; 0.50000000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve7y1y&lt;/th&gt;&lt;td&gt;-5.385355e-01&lt;/td&gt;&lt;td&gt; 1.119178e-01&lt;/td&gt;&lt;td&gt;-1.587484e-01&lt;/td&gt;&lt;td&gt; 1.153416e-01&lt;/td&gt;&lt;td&gt; 4.549395e-01&lt;/td&gt;&lt;td&gt; 4.507466e-01&lt;/td&gt;&lt;td&gt; 4.988054e-01&lt;/td&gt;&lt;td&gt;-3.640491e-13&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve10y2y&lt;/th&gt;&lt;td&gt;-0.38081672&lt;/td&gt;&lt;td&gt; 0.58044994&lt;/td&gt;&lt;td&gt;-0.17867132&lt;/td&gt;&lt;td&gt;-0.33936332&lt;/td&gt;&lt;td&gt;-0.20605357&lt;/td&gt;&lt;td&gt;-0.06584042&lt;/td&gt;&lt;td&gt;-0.27234639&lt;/td&gt;&lt;td&gt;-0.50000000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve10y5y&lt;/th&gt;&lt;td&gt;-0.06133330&lt;/td&gt;&lt;td&gt; 0.53314337&lt;/td&gt;&lt;td&gt;-0.22804983&lt;/td&gt;&lt;td&gt; 0.54276573&lt;/td&gt;&lt;td&gt;-0.28804119&lt;/td&gt;&lt;td&gt;-0.17604852&lt;/td&gt;&lt;td&gt; 0.03787086&lt;/td&gt;&lt;td&gt; 0.50000000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th scope=row&gt;curve30y10y&lt;/th&gt;&lt;td&gt;7.557077e-03&lt;/td&gt;&lt;td&gt;3.958458e-01&lt;/td&gt;&lt;td&gt;9.018019e-01&lt;/td&gt;&lt;td&gt;7.913918e-02&lt;/td&gt;&lt;td&gt;1.487753e-01&lt;/td&gt;&lt;td&gt;3.332223e-02&lt;/td&gt;&lt;td&gt;2.224416e-02&lt;/td&gt;&lt;td&gt;5.464379e-16&lt;/td&gt;&lt;/tr&gt;</code></pre>
-</tbody>
-</table>
+<p><img src="/images/pca-irs/output_40_0.svg" alt="svg"></p>
+<h2 id="Interpretation-of-Results-1"><a href="#Interpretation-of-Results-1" class="headerlink" title="Interpretation of Results"></a>Interpretation of Results</h2><figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">loadings = with(fit, unclass(loadings))</div><div class="line">loadings</div></pre></td></tr></table></figure>
+<table><br><thead><tr><th></th><th scope="col">Comp.1</th><th scope="col">Comp.2</th><th scope="col">Comp.3</th><th scope="col">Comp.4</th><th scope="col">Comp.5</th><th scope="col">Comp.6</th><th scope="col">Comp.7</th><th scope="col">Comp.8</th></tr></thead><br><tbody><br>    <tr><th scope="row">curve2y1y</th><td>-0.171227734</td><td>-0.195448923</td><td> 0.004706401</td><td> 0.667761277</td><td> 0.255984666</td><td>-0.361642751</td><td>-0.200598804</td><td>-0.500000000</td></tr><br>    <tr><th scope="row">curve3y1y</th><td>-3.263336e-01</td><td>-2.874607e-01</td><td> 1.814160e-01</td><td> 2.487582e-01</td><td>-5.310257e-01</td><td> 5.745447e-01</td><td>-3.224754e-01</td><td> 3.785444e-13</td></tr><br>    <tr><th scope="row">curve4y1y</th><td>-4.295687e-01</td><td>-2.585274e-01</td><td> 2.043599e-01</td><td>-1.301226e-01</td><td>-4.286356e-01</td><td>-4.860891e-01</td><td> 5.195463e-01</td><td>-6.752862e-13</td></tr><br>    <tr><th scope="row">curve5y1y</th><td>-0.49071115</td><td>-0.14814235</td><td> 0.05408491</td><td>-0.21436777</td><td> 0.33797228</td><td>-0.25143465</td><td>-0.51081605</td><td> 0.50000000</td></tr><br>    <tr><th scope="row">curve7y1y</th><td>-5.385355e-01</td><td> 1.119178e-01</td><td>-1.587484e-01</td><td> 1.153416e-01</td><td> 4.549395e-01</td><td> 4.507466e-01</td><td> 4.988054e-01</td><td>-3.640491e-13</td></tr><br>    <tr><th scope="row">curve10y2y</th><td>-0.38081672</td><td> 0.58044994</td><td>-0.17867132</td><td>-0.33936332</td><td>-0.20605357</td><td>-0.06584042</td><td>-0.27234639</td><td>-0.50000000</td></tr><br>    <tr><th scope="row">curve10y5y</th><td>-0.06133330</td><td> 0.53314337</td><td>-0.22804983</td><td> 0.54276573</td><td>-0.28804119</td><td>-0.17604852</td><td> 0.03787086</td><td> 0.50000000</td></tr><br>    <tr><th scope="row">curve30y10y</th><td>7.557077e-03</td><td>3.958458e-01</td><td>9.018019e-01</td><td>7.913918e-02</td><td>1.487753e-01</td><td>3.332223e-02</td><td>2.224416e-02</td><td>5.464379e-16</td></tr><br></tbody><br></table>
+
+
+
+
 <p>Earlier I confirmed my hypothesis of the interpretation of the principal components, namely that:</p>
 <ul>
 <li>Principal Component 1: Directional movements in the yield curve. These are movements that shift the entire yield curve up or down.</li>
@@ -358,55 +236,40 @@ Comp.8
 </ul>
 <p>Recall that the major shortcoming of that analysis was that we included the short end of the curve in all our time series and was unable to isolate the middle portion fo the curve individually. We are able to do that now. We see that the same interpretation of the principal components hold.</p>
 <ul>
-<li>Principal Component 1: Almost all the loadings are negative (with a very small positive for the 30s10s which we can ignore since it is two orders of magnitude smaller than the other loadings and would have been suppressed by <code>R</code>’s output if not for the fact that I forced the output to be present). Since the signs of loadings are arbitrary in PCA, we can conclude that in PC1 type movement, all sections of the yield curve move in the same direction. This corresponds to directional movements in the yield curve where the entire curve shifts up or down.</li>
+<li>Principal Component 1: Almost all the loadings are negative (with a very small positive for the 30s10s which we can ignore since it is two orders of magnitude smaller than the other loadings and would have been suppressed by <code>R</code>‘s output if not for the fact that I forced the output to be present). Since the signs of loadings are arbitrary in PCA, we can conclude that in PC1 type movement, all sections of the yield curve move in the same direction. This corresponds to directional movements in the yield curve where the entire curve shifts up or down.</li>
 <li>Principal Component 2: The short end of the curve (2s1s, 3s1s, 4s1s, 5s1s) are negative while the middle (7s1s, 10s2s, 10s5s) are positive as far the far end (30s10s). Again, signs are arbitrary in PCA loadings. This means that in PC2 type movements, the far and middle end moves in opposite direction as the short end. This corresponds well with the slope interpretation.</li>
 <li>Principal Component 3: The short end and the long end moves in the same direction while the middle end moves in the opposite direction. This again corresponds well with the interpretation of curvature movements.</li>
 </ul>
 <p>This relationship is summarized in the plot below.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">loadings = with(fit, unclass(loadings))</div><div class="line">loadings_dataframe = data.frame(index(loadings), loadings)</div><div class="line">colnames(loadings_dataframe) = c(<span class="string">'tenor'</span>, <span class="string">'pc1'</span>, <span class="string">'pc2'</span>, <span class="string">'pc3'</span>, <span class="string">'pc4'</span>, <span class="string">'pc5'</span>, <span class="string">'pc6'</span>, <span class="string">'pc7'</span>, <span class="string">'pc8'</span>)</div><div class="line">keeps = c(<span class="string">'tenor'</span>, <span class="string">'pc1'</span>, <span class="string">'pc2'</span>, <span class="string">'pc3'</span>)</div><div class="line">loadings_dataframe = loadings_dataframe[keeps]</div><div class="line">loadings_melted = melt(loadings_dataframe, id.vars=<span class="string">'tenor'</span>)</div><div class="line">plot = ggplot() + geom_line(data=loadings_melted, aes(x=tenor, y=value, color=variable)) + scale_x_discrete(labels=c(<span class="string">'2y1y'</span>, <span class="string">'3y1y'</span>, <span class="string">'4y1y'</span>, <span class="string">'5y1y'</span>, <span class="string">'7y1y'</span>, <span class="string">'10y2y'</span>, <span class="string">'10y5y'</span>, <span class="string">'30y10y'</span>)) + xlab(<span class="string">'Tenor'</span>) + ylab(<span class="string">'Loading of First 3 PCs'</span>)</div><div class="line">plot</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_44_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_44_0.svg" alt="svg"></p>
 <p>To confirm this further, I can plot each of the principal components with yield movements.</p>
-<h3 id="first-principal-component">First Principal Component</h3>
-<p>I plot both the scores of the first principal component and the swap rate for a 10 year IRS and find that the correlation indeed holds up, and this shows that my interpretation of the principal component holds.</p>
+<h3 id="First-Principal-Component"><a href="#First-Principal-Component" class="headerlink" title="First Principal Component"></a>First Principal Component</h3><p>I plot both the scores of the first principal component and the swap rate for a 10 year IRS and find that the correlation indeed holds up, and this shows that my interpretation of the principal component holds.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">source</span>(<span class="string">'graphing_utility.R'</span>)</div><div class="line">first_factor_10y = data.frame(rownames(scores), scores_dataframe$pc1, last(DSWP10, <span class="number">250</span>))</div><div class="line">colnames(first_factor_10y) = c(<span class="string">'date'</span>, <span class="string">'pc1'</span>, <span class="string">'y10'</span>)</div><div class="line">first_factor_10y$pc1 = -first_factor_10y$pc1</div><div class="line"></div><div class="line">p1 = ggplot() + geom_line(data=first_factor_10y, aes(x=as.Date(date), y=pc1), colour=gg_color_hue(<span class="number">1</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'left/red: PC1\nright/blue: 10y Yield'</span>)</div><div class="line">p2 = ggplot() + geom_line(data=first_factor_10y, aes(x=as.Date(date), y=y10), colour=gg_color_hue(<span class="number">2</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme(panel.background = element_rect(fill = <span class="literal">NA</span>))</div><div class="line">g = stack_plot(p1, p2)</div><div class="line">grid.draw(g)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_46_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<h3 id="second-principal-component">Second Principal Component</h3>
-<p>To see that the second principal component holds, I use a common curve trade: 10s2s. To see why this represents slope, one can consider the bets I made:</p>
+<p><img src="/images/pca-irs/output_46_0.svg" alt="svg"></p>
+<h3 id="Second-Principal-Component"><a href="#Second-Principal-Component" class="headerlink" title="Second Principal Component"></a>Second Principal Component</h3><p>To see that the second principal component holds, I use a common curve trade: 10s2s. To see why this represents slope, one can consider the bets I made:</p>
 <ul>
 <li>Receive fixed for 10 year IRS: if rates go up on the long end, I lose</li>
 <li>Pay fixed for 2 year IRS: if rates go up in the short end, I gain</li>
 </ul>
 <p>Hence, I’m making a bet on the slope of the curve. In fact, this bet is a steepener (I profit when the curve steepens). The yield rate for this trade is constructed as:</p>
-<p><span class="math display">\[C\_{2, 10} = Y\_{0, 10} - Y\_{0, 2}\]</span></p>
-<p>where <span class="math inline">\(C\)</span> is the rate for curve trade, <span class="math inline">\(Y\)</span> is the IRS yield.</p>
+<p>$$C_{2, 10} = Y_{0, 10} - Y_{0, 2}$$</p>
+<p>where $C$ is the rate for curve trade, $Y$ is the IRS yield.</p>
 <p>I again find a high level of correlation in the movements.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">second_factor_10y2y = data.frame(rownames(scores), scores_dataframe$pc2, last(curve10_2, <span class="number">250</span>))</div><div class="line">colnames(second_factor_10y2y) = c(<span class="string">'date'</span>, <span class="string">'pc2'</span>, <span class="string">'curve10y2y'</span>)</div><div class="line"></div><div class="line">p1 = ggplot() + geom_line(data=second_factor_10y2y, aes(x=as.Date(date), y=pc2), colour=gg_color_hue(<span class="number">1</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'left/red: PC2\nright/blue: 10s2s Yield'</span>)</div><div class="line">p2 = ggplot() + geom_line(data=second_factor_10y2y, aes(x=as.Date(date), y=curve10y2y), colour=gg_color_hue(<span class="number">2</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme(panel.background = element_rect(fill = <span class="literal">NA</span>))</div><div class="line">g = stack_plot(p1, p2)</div><div class="line">grid.draw(g)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_48_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
-<h3 id="third-principal-component">Third Principal Component</h3>
-<p>To see that the third principal component holds, I use another common trade: a butterfly of 2s10s30s. This is essentially:</p>
+<p><img src="/images/pca-irs/output_48_0.svg" alt="svg"></p>
+<h3 id="Third-Principal-Component"><a href="#Third-Principal-Component" class="headerlink" title="Third Principal Component"></a>Third Principal Component</h3><p>To see that the third principal component holds, I use another common trade: a butterfly of 2s10s30s. This is essentially:</p>
 <ul>
 <li>Receive fixed on 2 year IRS: I lose if rates go up on the short end</li>
 <li>Pay fixed on two 10 year IRS: I gain if rates go up in the middle end</li>
 <li>Receive fixed on 30 year IRS: I lose if rates go up in the far end</li>
 </ul>
 <p>The yield can be constructed as</p>
-<p><span class="math display">\[C\_{2,10,30} = \left(Y\_{0,10} - Y\_{0,2}\right) - \left(Y\_{0,30} - Y\_{0,10}\right)\]</span></p>
+<p>$$C_{2,10,30} = \left(Y_{0,10} - Y_{0,2}\right) - \left(Y_{0,30} - Y_{0,10}\right)$$</p>
 <p>Essentially, I am long two 10 year IRS, and short one 2 year IRS and one 30 year IRS. This can be seen as a bet on curvature. If the rates go up in the middle and go down in the two ends, I profit. Thus this is a curvature bet.</p>
 <p>Again there is a high degree of correlation between this and the yields of a butterfly, confirming my interpretation of the third principal component.</p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">butterfly2_10_30 = (DSWP10 - DSWP5) - (DSWP30 - DSWP10)</div><div class="line">third_factor_butterfly = data.frame(rownames(scores), scores_dataframe$pc3, last(butterfly2_10_30, <span class="number">250</span>))</div><div class="line">colnames(third_factor_butterfly) = c(<span class="string">'date'</span>, <span class="string">'pc3'</span>, <span class="string">'butterfly2y10y30y'</span>)</div><div class="line">third_factor_butterfly$pc3 = -third_factor_butterfly$pc3</div><div class="line"></div><div class="line">p1 = ggplot() + geom_line(data=third_factor_butterfly, aes(x=as.Date(date), y=pc3), colour=gg_color_hue(<span class="number">1</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + xlab(<span class="string">'Date'</span>) + ylab(<span class="string">'left/red: PC3, right/blue: 2s10s30s Yield'</span>)</div><div class="line">p2 = ggplot() + geom_line(data=third_factor_butterfly, aes(x=as.Date(date), y=butterfly2y10y30y), colour=gg_color_hue(<span class="number">2</span>)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme(panel.background = element_rect(fill = <span class="literal">NA</span>))</div><div class="line">g = stack_plot(p1, p2)</div><div class="line">grid.draw(g)</div></pre></td></tr></table></figure>
-<div class="figure">
-<img src="/images/pca-irs/output_50_0.svg" alt="svg">
-<p class="caption">svg</p>
-</div>
+<p><img src="/images/pca-irs/output_50_0.svg" alt="svg"></p>
 
       
     </div>
